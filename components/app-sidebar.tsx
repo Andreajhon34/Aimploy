@@ -31,13 +31,27 @@ import {
     FileText
 } from "lucide-react"
 import Link from "next/link"
+import { useSidebar } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
+
 
 const AppLogo = () => {
+    const { state } = useSidebar();
+
     return (
-        <div className="flex px-2">
-            <h1 className="font-bold">Aimploy.ai</h1>
+        <div className={cn(
+            "flex size-full", 
+            state === "collapsed"  && "justify-center",
+            state === "expanded" && "px-2"
+        )}>
+            {state === "expanded" 
+            ? (
+                <h1 className="font-bold">Aimploy.ai</h1>
+            ) : (
+                <h1 className="font-bold">Ai</h1>
+            )}
         </div>
-    )
+    );
 }
 
 const FeatureItems = () => {
@@ -63,9 +77,13 @@ const FeatureItems = () => {
 
 export function AppSidebar() {
     return (
-        <Sidebar>
+        <Sidebar collapsible="icon">
         <SidebarHeader>
-            <AppLogo />
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <AppLogo />
+                </SidebarMenuItem>
+            </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
             <SidebarGroup>

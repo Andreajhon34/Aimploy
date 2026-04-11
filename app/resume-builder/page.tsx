@@ -620,7 +620,7 @@ export default function ResumeBuilderPage() {
         <div className="flex h-dvh w-full relative">
             <ResizablePanelGroup orientation={isMd ? "horizontal" : "vertical"}>              
                 <ResizablePanel defaultSize="40%" minSize="35%" maxSize="60%">
-                    <div className="px-4 h-full overflow-y-auto no-scrollbar">
+                    <ScrollArea className="px-4 h-full">
                         <h1 className="text-xl font-bold my-3">Resume builder</h1>
                         <form className="flex flex-col gap-4" onSubmit={methods.handleSubmit(onSubmit)}>
                             <FormProvider {...methods}>
@@ -634,8 +634,8 @@ export default function ResumeBuilderPage() {
                                 Generate with Aimploy
                             </Button>
                         </form>
-                        {/* <ScrollBar className="invisible no-scrollbar" /> */}
-                    </div>
+                        <ScrollBar />
+                    </ScrollArea>
                 </ResizablePanel>
                 <ResizableHandle withHandle/>
                 <ResizablePanel defaultSize="60">
@@ -645,9 +645,10 @@ export default function ResumeBuilderPage() {
                             Export to PDF
                         </Button>
                     </div>
-                    <div className="h-full overflow-auto no-scrollbar">
+                    <ScrollArea className="h-full">
                         <Template1 ref={contentRef} />
-                    </div>
+                        <ScrollBar />
+                    </ScrollArea>
                 </ResizablePanel>
             </ResizablePanelGroup>  
         </div>
