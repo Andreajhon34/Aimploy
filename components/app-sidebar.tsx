@@ -28,7 +28,8 @@ import {
     ChevronDown,
     Plus,
     Home,
-    FileText
+    FileText,
+    Search
 } from "lucide-react"
 import Link from "next/link"
 import { useSidebar } from "@/components/ui/sidebar"
@@ -56,7 +57,8 @@ const AppLogo = () => {
 
 const FeatureItems = () => {
     const features = [
-        { name: "Resume builder", href: "/resume-builder", Icon: FileText}
+        { name: "Resume builder", href: "/resume-builder", Icon: FileText },
+        { name: "ATS Checker", href: "/ats-checker", Icon: Search }
     ] as const;
 
     return (

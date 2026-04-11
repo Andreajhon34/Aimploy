@@ -62,33 +62,36 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { Skeleton } from "@/components/ui/skeleton";
+import { pubApi } from "@/lib/axios";
 
-
+/**
+ *  Check on this, please help me tweak if something feels off
+ */
 const personalInformationSchema = z.object({
-    fullName: z.string(),
-    job: z.string(),
-    email: z.string(),
-    number: z.string(),
+    fullName: z.string().min(2, "Nama terlalu pendek"),
+    job: z.string().min(2, "Pekerjaan harus diisi"),
+    email: z.string().email("Format email salah"),
+    number: z.string().min(10, "Nomor telepon tidak valid"),
     describeProfile: z.string(),
-    linkedinProfile: z.string()
+    linkedinProfile: z.string().url("Mohon masukkan link yang valid").or(z.literal("")),
 });
 
 const experienceSchema = z.object({
     id: z.string(),
-    company: z.string(),
-    position: z.string(),
+    company: z.string().min(1, "Nama perusahaan wajib diisi"),
+    position: z.string().min(1, "Posisi wajib diisi"),
     startDate: z.string(),
     endDate: z.string(),
-    jobDescription: z.string()
+    jobDescription: z.string(),
 });
 
 const eduationSchema = z.object({
     id: z.string(),
-    institute: z.string(),
-    degree: z.string(),
-    startYear: z.string(),
+    institute: z.string().min(1, "Nama sekolah/kampus wajib diisi"),
+    degree: z.string().min(1, "Gelar atau jenjang pendidikan wajib diisi"),
+    startYear: z.string().min(4, "Tahun mulai tidak valid"), 
     endYear: z.string(),
-    description: z.string()
+    description: z.string(),
 });
 
 type PersonalInformationSchema = z.infer<typeof personalInformationSchema>;
@@ -97,9 +100,9 @@ type EducationSchema = z.infer<typeof eduationSchema>;
 
 const resumeBuilderSchema = z.object({
     personalInformation: personalInformationSchema,
-    experiences: z.array(experienceSchema),
-    educations: z.array(eduationSchema),
-    skills: z.string()
+    experiences: z.array(experienceSchema).min(1, "Pengalaman kerja wajib diisi"),
+    educations: z.array(eduationSchema).min(1, "Pendidikan wajib diisi"),
+    skills: z.string().min(2, "Keahlian wajib diisi")
 });
 
 type ResumeBuilderSchema = z.infer<typeof resumeBuilderSchema>;
@@ -107,6 +110,7 @@ type ResumeBuilderSchema = z.infer<typeof resumeBuilderSchema>;
 import type { HTMLAttributes, ReactNode } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useReactToPrint } from "react-to-print";
+import { cn } from "@/lib/utils";
 
 type CardBaseProps = {
     children: ReactNode;
@@ -127,6 +131,33 @@ const CardBase = ({ children, title }: CardBaseProps) => {
         </Card>       
     );
 }
+
+const PERSONAL_INFORMATION_DEFAULTS: PersonalInformationSchema  = {
+    fullName: "",
+    email: "",
+    job: "",
+    number: "",
+    describeProfile: "",
+    linkedinProfile: ""
+}
+
+const EXPERIENCE_DEFAULTS: ExperienceSchema = {
+    id: crypto.randomUUID(),
+    company: "",
+    endDate: "Sekarang",
+    position: "",
+    startDate: "",
+    jobDescription: ""
+};
+
+const EDUCATION_DEFAULT: EducationSchema = {
+    id: crypto.randomUUID(),
+    degree: "",
+    endYear: "Sekarang",
+    institute: "",
+    startYear: "",
+    description: ""
+};
 
 const PersonalInformationCard = () => {
     const context = useFormContext<ResumeBuilderSchema>();
@@ -376,14 +407,8 @@ const ExperienceCard = () => {
             ))}
 
             <Button
-                onClick={() => append({
-                    id: Date.now().toString(),
-                    company: "",
-                    endDate: "",
-                    startDate: "",
-                    jobDescription: "",
-                    position: ""
-                })}
+                onClick={() => append(EXPERIENCE_DEFAULTS)}
+                type="button"
             >
                 <Plus />
                 Tambah
@@ -488,14 +513,8 @@ const EducationCard = () => {
             ))}
 
              <Button
-                onClick={() => append({
-                    id: Date.now().toString(),
-                    degree: "",
-                    startYear: "",
-                    endYear: "",
-                    institute: "",
-                    description: ""
-                })}
+                onClick={() => append(EDUCATION_DEFAULT)}
+                type="button"
             >
                 <Plus />
                 Tambah
@@ -542,32 +561,7 @@ const SkillCard = () => {
 }
 
 
-const PERSONAL_INFORMATION_DEFAULTS: PersonalInformationSchema  = {
-    fullName: "",
-    email: "",
-    job: "",
-    number: "",
-    describeProfile: "",
-    linkedinProfile: ""
-}
 
-const EXPERIENCE_DEFAULTS: ExperienceSchema = {
-    id: "1",
-    company: "",
-    endDate: "",
-    jobDescription: "",
-    position: "",
-    startDate: ""
-};
-
-const EDUCATION_DEFAULT: EducationSchema = {
-    id: "1",
-    degree: "",
-    endYear: "",
-    institute: "",
-    startYear: "",
-    description: ""
-};
 
 export default function ResumeBuilderPage() {
     const methods = useForm<ResumeBuilderSchema>({
@@ -581,7 +575,9 @@ export default function ResumeBuilderPage() {
         mode: "onBlur"
     });
 
-    const isLoading = methods.formState.isSubmitting || !methods.formState.isValid;
+    const isSubmitting = methods.formState.isSubmitting;
+
+    const isSubmittingOrisInvalid = isSubmitting || !methods.formState.isValid;
 
     const isMd = useMediaQuery({ minWidth: "768px"});
 
@@ -608,7 +604,11 @@ export default function ResumeBuilderPage() {
 
     const onSubmit = async (data: ResumeBuilderSchema) => {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            const response = await pubApi.post("/resume-builder", {
+                ...data
+            });
+
+            console.log(response.data);
         } catch (error) {
             console.error(error);
             alert("Terjadi kesalahan saat menghubungi AI");
@@ -629,9 +629,20 @@ export default function ResumeBuilderPage() {
                                 <EducationCard />
                                 <SkillCard />
                             </FormProvider>
-                            <Button type="submit" size="lg" className="my-4" disabled={isLoading}>
-                                <Sparkle />
-                                Generate with Aimploy
+                            {methods.formState.errors.experiences?.message ? (
+                                <p className="text-destructive self-center text-sm">{methods.formState.errors.experiences.message}</p>
+                            ) : (
+                                methods.formState.errors.educations ? (
+                                    <p className="text-destructive self-center text-sm">{methods.formState.errors.educations.message}</p>
+                                ) : null
+                            )}
+                            <Button type="submit" size="lg" className="my-4" disabled={isSubmittingOrisInvalid}>
+                                <Sparkle className={cn(isSubmitting && "animate-spin")} />
+                                {isSubmitting ? (
+                                    "Generating..."
+                                ) : (
+                                    "Generate with Aimploy"
+                                )}
                             </Button>
                         </form>
                         <ScrollBar />

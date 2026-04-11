@@ -28,8 +28,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Goodgoods",
-  description: "Home page of Goodgoods",
+  title: "Aimploy",
+  description: "Aimploy is an AI-powered CV and Resume builder website ",
 };
 
 const MainNavbar = () => {
