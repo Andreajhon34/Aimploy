@@ -1,3 +1,30 @@
+# Aimploy.ai
+
+## Description
+Aimploy is an AI-Powered resume and career assistant platform designed to help users create professional CVs and Resumes 
+
+## Features
+1. Resume Generator – Input your experience and skills, generate a professional CV
+2. Cover Letter Generator – Automatically create a tailored cover letter for a specific job
+3. Bio/Summary Generator – Generate a professional personal summary
+4. Job Description Analyzer – Paste a job description and analyze required skills
+5. ATS Checker – Evaluate whether your CV passes Applicant Tracking Systems
+6. Template Selector – Choose CV designs (minimalist, modern, creative, etc.)
+7. Section Manager – Add, remove, and reorder CV sections (Education, Experience, etc.)
+8. Bullet Point Enhancer – Turn basic experience into impactful, professional bullet points
+9. Skill Suggester – Suggest relevant skills based on the target job
+10. Keyword Optimizer – Add high-impact keywords frequently used by recruiters
+11. CV Reviewer – Upload an existing CV and receive feedback and improvements
+12. Score Checker – Get a score for your CV (e.g., out of 100)
+13. Gap Analyzer – Identify missing qualifications compared to a target job
+14. Tone Checker – Ensure consistent and professional language
+15. LinkedIn Bio Generator – Generate a concise version for LinkedIn profiles
+16. Portfolio Summary Generator – Summarize projects for a portfolio
+17. Language Selector – Generate CVs in Bahasa Indonesia or English
+18. Multi-format Export – Export to PDF, DOCX, or TXT
+19. Save & History – Save and manage multiple CV versions
+20. Job Target Manager – Create different CVs for different job applications
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
