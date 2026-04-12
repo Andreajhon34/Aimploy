@@ -9,13 +9,14 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
 import Link from "next/link";
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
 const MainNavbar = () => {
   const navLinks = [
     { href: "/product", name: "Products" },
-    { href: "/about", name: "About" }
+    { href: "/about", name: "About" },
   ] as const;
 
   return (
@@ -48,19 +49,22 @@ const MainNavbar = () => {
         </h1>
         <NavigationMenu>
           <NavigationMenuList>
-              {navLinks.map(({ href, name }) => (
-                <NavigationMenuItem key={href}>
-                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                    <Link href={href}>{name}</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
+            {navLinks.map(({ href, name }) => (
+              <NavigationMenuItem key={href}>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}
+                >
+                  <Link href={href}>{name}</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
           </NavigationMenuList>
         </NavigationMenu>
       </div>
     </header>
   );
-} 
+};
 
 export default function RootLayout({
   children,
@@ -71,14 +75,21 @@ export default function RootLayout({
     <html
       suppressHydrationWarning
       lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      className={cn(
+        "h-full",
+        "antialiased",
+        geistSans.variable,
+        geistMono.variable,
+        "font-sans",
+        inter.variable,
+      )}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
           <SidebarProvider>
             <AppSidebar />
@@ -86,6 +97,7 @@ export default function RootLayout({
               <SidebarTrigger />
               {children}
             </main>
+            <Toaster position="top-center" />
           </SidebarProvider>
         </ThemeProvider>
       </body>

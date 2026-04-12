@@ -1,667 +1,140 @@
-"use client"
+"use client";
 
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group"
-import { 
-    Briefcase, 
-    Plus, 
-    SendHorizonal,
-    GraduationCap, 
-    Trash, 
-    User,
-    Wrench,
-    Sparkle,
-    Printer
-} from "lucide-react";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Printer } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { 
-    useForm, 
-    Controller, 
-    type Control, 
-    FormProvider, 
-    useFormContext,
-    useFieldArray 
-} from 'react-hook-form';
+import { FormProvider, useForm } from "react-hook-form";
 
-import { z } from 'zod';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import EducationCard from "@/components/resume-builder/cards/educationCard";
+import ExperienceCard from "@/components/resume-builder/cards/experienceCard";
+import PersonalInformationCard from "@/components/resume-builder/cards/personalInformationCard";
+import SkillCard from "@/components/resume-builder/cards/skillCard";
 import { Template1 } from "@/components/resume-builder/templates";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { pubApi } from "@/lib/axios";
-
-/**
- *  Check on this, please help me tweak if something feels off
- */
-const personalInformationSchema = z.object({
-    fullName: z.string().min(2, "Nama terlalu pendek"),
-    job: z.string().min(2, "Pekerjaan harus diisi"),
-    email: z.string().email("Format email salah"),
-    number: z.string().min(10, "Nomor telepon tidak valid"),
-    describeProfile: z.string(),
-    linkedinProfile: z.string().url("Mohon masukkan link yang valid").or(z.literal("")),
-});
-
-const experienceSchema = z.object({
-    id: z.string(),
-    company: z.string().min(1, "Nama perusahaan wajib diisi"),
-    position: z.string().min(1, "Posisi wajib diisi"),
-    startDate: z.string(),
-    endDate: z.string(),
-    jobDescription: z.string(),
-});
-
-const eduationSchema = z.object({
-    id: z.string(),
-    institute: z.string().min(1, "Nama sekolah/kampus wajib diisi"),
-    degree: z.string().min(1, "Gelar atau jenjang pendidikan wajib diisi"),
-    startYear: z.string().min(4, "Tahun mulai tidak valid"), 
-    endYear: z.string(),
-    description: z.string(),
-});
-
-type PersonalInformationSchema = z.infer<typeof personalInformationSchema>;
-type ExperienceSchema = z.infer<typeof experienceSchema>;
-type EducationSchema = z.infer<typeof eduationSchema>;
-
-const resumeBuilderSchema = z.object({
-    personalInformation: personalInformationSchema,
-    experiences: z.array(experienceSchema).min(1, "Pengalaman kerja wajib diisi"),
-    educations: z.array(eduationSchema).min(1, "Pendidikan wajib diisi"),
-    skills: z.string().min(2, "Keahlian wajib diisi")
-});
-
-type ResumeBuilderSchema = z.infer<typeof resumeBuilderSchema>;
-
-import type { HTMLAttributes, ReactNode } from "react";
+import type { ResumeBuilderSchema } from "@/schemas/resume-builder";
+import { resumeBuilderSchema } from "@/schemas/resume-builder";
+import {
+  PERSONAL_INFORMATION_DEFAULTS,
+  SKILLS_DEFAULT,
+} from "@/utils/constants/resumeBuilder";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "react-responsive";
 import { useReactToPrint } from "react-to-print";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
-type CardBaseProps = {
-    children: ReactNode;
-    title: ReactNode
+type ResponseData = {
+  personalInfo: {
+    name: string;
+    title: string;
+    email: string;
+    phone: string;
+    linkedin: string;
+  };
+  summary: string;
+  experience: {
+    id: string;
+    role: string;
+    company: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    achievements: string[];
+  }[];
+  education: {
+    id: number;
+    degree: string;
+    institution: string;
+    location: string;
+    graduationDate: string;
+    details: string;
+  }[];
+  skills: {
+    programming: string[];
+    frameworks: string[];
+    tools: string[];
+  };
 };
-
-const CardBase = ({ children, title }: CardBaseProps) => {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex flex-row gap-x-3 justify-center">
-                    {title}
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-y-4">
-                {children} 
-            </CardContent>
-        </Card>       
-    );
-}
-
-const PERSONAL_INFORMATION_DEFAULTS: PersonalInformationSchema  = {
-    fullName: "",
-    email: "",
-    job: "",
-    number: "",
-    describeProfile: "",
-    linkedinProfile: ""
-}
-
-const EXPERIENCE_DEFAULTS: ExperienceSchema = {
-    id: crypto.randomUUID(),
-    company: "",
-    endDate: "Sekarang",
-    position: "",
-    startDate: "",
-    jobDescription: ""
-};
-
-const EDUCATION_DEFAULT: EducationSchema = {
-    id: crypto.randomUUID(),
-    degree: "",
-    endYear: "Sekarang",
-    institute: "",
-    startYear: "",
-    description: ""
-};
-
-const PersonalInformationCard = () => {
-    const context = useFormContext<ResumeBuilderSchema>();
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex flex-row gap-x-3 justify-center">
-                    <User />
-                    Informasi Pribadi
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-y-4">
-                <Controller
-                    name="personalInformation.fullName"
-                    control={context.control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="fullName">
-                                Nama Lengkap
-                            </FieldLabel>
-                            <Input
-                                {...field}
-                                id="fullName"
-                                aria-invalid={fieldState.invalid}
-                                placeholder="Dill doe"
-                                autoComplete="off"
-                            />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    name="personalInformation.job"
-                    control={context.control}
-                    render={({ field, fieldState }) => (
-                       <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="jobInput">
-                                Posisi Pekerjaan
-                            </FieldLabel>
-                            <Input
-                                {...field}
-                                id="jobInput"
-                                aria-invalid={fieldState.invalid}
-                                placeholder="data analyst"
-                                autoComplete="off"
-                            />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
-                        </Field>
-                    )}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                    <Controller
-                    name="personalInformation.email"
-                    control={context.control}
-                    render={({ field, fieldState }) => (
-                       <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="EmailInput">
-                                Email
-                            </FieldLabel>
-                            <Input
-                                {...field}
-                                id="EmailInput"
-                                aria-invalid={fieldState.invalid}
-                                placeholder="dill.doe@email.com"
-                                autoComplete="off"
-                            />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
-                        </Field>
-                        )}
-                    />
-                    <Controller
-                        name="personalInformation.number"
-                        control={context.control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="numberInput">
-                                        Nomor Telepon
-                                    </FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="numberInput"
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="+62 123-4567-8910"
-                                        autoComplete="off"
-                                    />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                            </Field>
-                        )}
-                    />
-                    
-                </div>
-                <Controller
-                    name="personalInformation.linkedinProfile"
-                    control={context.control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="linkedinInput">
-                                Profil LinkedIn
-                            </FieldLabel>
-                            <Input
-                                {...field}
-                                id="linkedinInput"
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                                placeholder="linkedin.com/in/dill-doe"
-                            />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    name="personalInformation.describeProfile"
-                    control={context.control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="describeInput">
-                                    Ringkasan Profil
-                                </FieldLabel>
-                                <Textarea
-                                    {...field}
-                                    id="describeInput"
-                                    aria-invalid={fieldState.invalid}
-                                    placeholder="Seorang data analyst yang teliti dengan keahlian dalam pemodelan statistik, visualisasi data dan query berbasis SQL"
-                                    autoComplete="off"
-                                />
-                                {fieldState.invalid && (
-                                    <FieldError errors={[fieldState.error]} />
-                                )}
-                        </Field>
-                    )}
-                />
-                
-            </CardContent>
-        </Card>
-    );
-}
-
-const ExperienceCard = () => {
-    const { control } = useFormContext<ResumeBuilderSchema>();
-    const { append, remove, fields } = useFieldArray({ 
-        control,
-        name: "experiences"
-    });
-
-    type InputProperties = {
-        readonly htmlFor: string;
-        readonly label: string;
-        readonly name: keyof ExperienceSchema;
-        readonly placeholder?: string;
-        readonly className?: HTMLAttributes<HTMLDivElement>['className'];
-    };
-
-    const inputProperties: ReadonlyArray<InputProperties> = [
-        { htmlFor: "companyInput", label: "Perusahaan", name: "company", className:"col-span-1", placeholder: "PT Teknologi Inovasi Nusantara" },
-        { htmlFor: "positionInput", label: "Posisi", name: "position", className: "col-span-1", placeholder: "Senior data analyst" },
-        { htmlFor: "startDateInput", label: "Tanggal Mulai", name: "startDate", className: "col-span-1", placeholder: "Jan 2021" },
-        { htmlFor: "endDateInput", label: "Tanggal Selesai", name: "endDate", className: "col-span-1", placeholder: "hari ini" }
-    ];
-
-    return (
-        <CardBase 
-            title={
-                <>
-                    <Briefcase />
-                    Pengalaman kerja
-                </>
-            }
-        >
-            {fields.map((field, index) => (
-                <Card key={field.id}>
-                    <CardHeader>
-                        <CardAction>
-                            <Button
-                                type="button"
-                                variant="destructive"
-                                onClick={() => remove(index)}
-                            >
-                                <Trash />
-                            </Button>
-                        </CardAction>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-2 gap-3">
-                        {inputProperties.map(({ 
-                            htmlFor, 
-                            label, 
-                            name, 
-                            placeholder,
-                            className 
-                        }) => (
-                            <Controller
-                                key={htmlFor}
-                                name={`experiences.${index}.${name}`}
-                                control={control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid} className={className}>
-                                        <FieldLabel htmlFor={htmlFor}>
-                                            {label}
-                                        </FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={htmlFor}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder={placeholder}
-                                            autoComplete="off"
-                                        />
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
-                        ))}
-                        <Controller
-                            name={`experiences.${index}.jobDescription`}
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid} className="col-span-2">
-                                    <FieldLabel htmlFor="jobDescriptionInput">
-                                        Deskripsi pekerjaan
-                                    </FieldLabel>
-                                    <Textarea
-                                        {...field}
-                                        id="jobDescriptionInput"
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        placeholder="Pengalaman lebih dari 7 tahun dalam analitik lanjutan, business intelegence dan strategi data"
-                                    />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                                </Field>
-                            )}
-                        />
-                    </CardContent>
-                </Card>
-            ))}
-
-            <Button
-                onClick={() => append(EXPERIENCE_DEFAULTS)}
-                type="button"
-            >
-                <Plus />
-                Tambah
-            </Button>
-        </CardBase>
-    );
-}
-
-const EducationCard = () => {
-    const { control } = useFormContext<ResumeBuilderSchema>();
-    const { fields, remove, append } = useFieldArray({ 
-        control,
-        name: "educations"
-    });
-
-
-    type InputProperties = {
-        readonly htmlFor: string;
-        readonly label: string;
-        readonly name: keyof EducationSchema;
-        readonly placeholder?: string;
-        readonly className: HTMLAttributes<HTMLDivElement>['className'];
-    };
-
-    const inputProperties: ReadonlyArray<InputProperties> = [
-        { htmlFor: "instituteInput", label: "Instusi / Sekolah", name: "institute", className:"col-span-1", placeholder: "Institut Teknologi Bandung" },
-        { htmlFor: "degreeInput", label: "Gelar / Sarjana", name: "degree", className: "col-span-1", placeholder: "Teknik Informatika" },
-        { htmlFor: "endYearInput", label: "Tanggal Selesai", name: "endYear", className: "col-span-1", placeholder: "May 2023" },
-        { htmlFor: "startYearInput", label: "Tanggal Mulai", name: "startYear", className: "col-span-1", placeholder: "Sept 2019" }
-    ];
-
-    return (
-        <CardBase
-            title={
-                <>
-                    <GraduationCap />
-                    Pendidikan       
-                </>
-            }
-        >
-            {fields.map((field, index) => (
-                <Card key={field.id}>
-                    <CardHeader>
-                        <CardAction>
-                            <Button
-                                type="button"
-                                variant="destructive"
-                                onClick={() => remove(index)}
-                            >
-                                <Trash />
-                            </Button>
-                        </CardAction>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-2 gap-3">
-                        {inputProperties.map((property) => (
-                            <Controller
-                                key={property.htmlFor}
-                                name={`educations.${index}.${property.name}`}
-                                control={control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid} className={property.className}>
-                                        <FieldLabel htmlFor={property.htmlFor}>
-                                            {property.label}
-                                        </FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={property.htmlFor}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder={property.placeholder}
-                                            autoComplete="off"
-                                        />
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
-                        ))}
-                        <Controller
-                            name={`educations.${index}.description`}
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid} className="col-span-2">
-                                    <FieldLabel htmlFor="descriptionInput">
-                                        Deskripsi / Catatan Tambahan
-                                    </FieldLabel>
-                                    <Textarea
-                                        {...field}
-                                        id="decriptionInput"
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        placeholder="IPK: 3.85. Aktif dalam himpunan mahasiswa dan memenangkan kompetisi hackathon nasional"
-                                    />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                                </Field>
-                            )}
-                        />
-                    </CardContent>
-                </Card>
-            ))}
-
-             <Button
-                onClick={() => append(EDUCATION_DEFAULT)}
-                type="button"
-            >
-                <Plus />
-                Tambah
-            </Button>
-        </CardBase>
-    );
-}
-
-const SkillCard = () => {
-    const { control } = useFormContext<ResumeBuilderSchema>();
-
-    return (
-        <CardBase
-            title={
-                <>
-                    <Wrench />
-                    Keahlian
-                </>
-            }
-        >
-            <Controller
-                name="skills"
-                control={control}
-                render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="skillsInput">
-                            Tuliskan keahlian kamu di sini
-                        </FieldLabel>
-                        <Textarea
-                            {...field}
-                            id="skillsInput"
-                            aria-invalid={fieldState.invalid}
-                            autoComplete="off"
-                            placeholder="JavaScript, TypeScript, React, Next.js, Node.js, Tailwind CSS, Git, PostgreSQL"
-                        />
-                        {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                        )}
-                    </Field>
-                )}
-            />
-        </CardBase>
-    );
-}
-
-
-
 
 export default function ResumeBuilderPage() {
-    const methods = useForm<ResumeBuilderSchema>({
-        resolver: zodResolver(resumeBuilderSchema),
-        defaultValues: {
-            personalInformation: PERSONAL_INFORMATION_DEFAULTS,
-            experiences: [],
-            educations: [],
-            skills: "" 
-        },
-        mode: "onBlur"
-    });
+  const methods = useForm<ResumeBuilderSchema>({
+    resolver: zodResolver(resumeBuilderSchema),
+    defaultValues: {
+      personalInformation: PERSONAL_INFORMATION_DEFAULTS,
+      experiences: [],
+      educations: [],
+      skills: SKILLS_DEFAULT,
+    },
+    mode: "onBlur",
+  });
 
-    const isSubmitting = methods.formState.isSubmitting;
+  const [isMounted, setIsMounted] = useState(false);
 
-    const isSubmittingOrisInvalid = isSubmitting || !methods.formState.isValid;
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
-    const isMd = useMediaQuery({ minWidth: "768px"});
+  const handlePrint = useReactToPrint({
+    contentRef,
+  });
 
-    const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-    const contentRef = useRef<HTMLDivElement | null>(null);
-
-    const handlePrint = useReactToPrint({
-        contentRef
-    });
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
-    if(!isMounted) {
-        return (
-            <div className="flex w-full h-dvh p-4 gap-4">
-                <Skeleton className="w-[40%] h-full rounded-xl" />
-                <Skeleton className="w-[60%] h-full rounded-xl" />
-            </div>
-        );
-    }
-
-    const onSubmit = async (data: ResumeBuilderSchema) => {
-        try {
-            const response = await pubApi.post("/resume-builder", {
-                ...data
-            });
-
-            console.log(response.data);
-        } catch (error) {
-            console.error(error);
-            alert("Terjadi kesalahan saat menghubungi AI");
-        } finally {};
-    };
-
-
+  if (!isMounted) {
     return (
-        <div className="flex h-dvh w-full relative">
-            <ResizablePanelGroup orientation={isMd ? "horizontal" : "vertical"}>              
-                <ResizablePanel defaultSize="40%" minSize="35%" maxSize="60%">
-                    <ScrollArea className="px-4 h-full">
-                        <h1 className="text-xl font-bold my-3">Resume builder</h1>
-                        <form className="flex flex-col gap-4" onSubmit={methods.handleSubmit(onSubmit)}>
-                            <FormProvider {...methods}>
-                                <PersonalInformationCard />
-                                <ExperienceCard />
-                                <EducationCard />
-                                <SkillCard />
-                            </FormProvider>
-                            {methods.formState.errors.experiences?.message ? (
-                                <p className="text-destructive self-center text-sm">{methods.formState.errors.experiences.message}</p>
-                            ) : (
-                                methods.formState.errors.educations ? (
-                                    <p className="text-destructive self-center text-sm">{methods.formState.errors.educations.message}</p>
-                                ) : null
-                            )}
-                            <Button type="submit" size="lg" className="my-4" disabled={isSubmittingOrisInvalid}>
-                                <Sparkle className={cn(isSubmitting && "animate-spin")} />
-                                {isSubmitting ? (
-                                    "Generating..."
-                                ) : (
-                                    "Generate with Aimploy"
-                                )}
-                            </Button>
-                        </form>
-                        <ScrollBar />
-                    </ScrollArea>
-                </ResizablePanel>
-                <ResizableHandle withHandle/>
-                <ResizablePanel defaultSize="60">
-                    <div className="absolute bottom-12 right-8 z-50">
-                        <Button onClick={handlePrint} className="shadow-lg h-16 w-42" variant="secondary">
-                            <Printer className="w-4 h-4 mr-2" />
-                            Export to PDF
-                        </Button>
-                    </div>
-                    <ScrollArea className="h-full">
-                        <Template1 ref={contentRef} />
-                        <ScrollBar />
-                    </ScrollArea>
-                </ResizablePanel>
-            </ResizablePanelGroup>  
-        </div>
+      <div className="flex w-full h-dvh p-4 gap-4">
+        <Skeleton className="w-[40%] h-full rounded-xl" />
+        <Skeleton className="w-[794px] h-full rounded-xl" />
+      </div>
     );
-} 
+  }
+
+  return (
+    <div className="flex flex-row h-dvh w-full">
+      {" "}
+      {/* 1. Kunci layar total */}
+      <FormProvider {...methods}>
+        <motion.div
+          className="flex-1 h-full min-w-sm"
+          variants={{
+            hidden: { opacity: 0, y: 24 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.6, ease: "easeOut" },
+            },
+          }}
+          initial="hidden"
+          animate="visible"
+        >
+          <ScrollArea className="h-full px-4">
+            <div className="flex flex-col gap-4">
+              <h1 className="text-xl font-bold my-3">Resume builder</h1>
+              <PersonalInformationCard />
+              <ExperienceCard />
+              <EducationCard />
+              <SkillCard />
+              <ScrollBar />
+            </div>
+            <ScrollBar />
+          </ScrollArea>
+        </motion.div>
+        <div className="absolute bottom-12 right-8 z-50">
+          <Button
+            onClick={handlePrint}
+            className="shadow-lg h-16 w-42"
+            variant="secondary"
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Export to PDF
+          </Button>
+        </div>
+        <ScrollArea className="h-full w-[794px]">
+          <Template1 watch={methods.watch} ref={contentRef} />
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
+      </FormProvider>
+    </div>
+  );
+}
