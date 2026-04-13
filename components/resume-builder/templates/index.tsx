@@ -52,14 +52,12 @@ export const Template1 = React.forwardRef<HTMLDivElement, Template1Props>(
     const skillsState = skills;
 
     return (
-      <div
-        {...props}
-        className="size-full bg-slate-100 py-8 px-4 sm:px-8 flex justify-center font-sans"
-      >
+      <>
         {/* Override the width to the screen settings */}
         <div
           ref={ref}
-          className="a4-page w-full! bg-white shadow-xl ring-1 ring-slate-900/5 text-slate-800"
+          {...props}
+          className="resume-conf shadow-xl ring-1 ring-slate-900/5 text-slate-800 font-serif print:font-serif"
         >
           {/* -- HEADER -- */}
           <header className="flex flex-col items-center sm:items-start text-center sm:text-left mb-6">
@@ -196,9 +194,10 @@ export const Template1 = React.forwardRef<HTMLDivElement, Template1Props>(
 
           {/* -- SKILLS -- */}
           <section>
-            {skillsState.categorized.length > 0 || skillsState.rawInput.length > 0 && (
-              <SectionTitle title="Keahlian" />
-            )}
+            {skillsState.categorized.length > 0 ||
+              (skillsState.rawInput.length > 0 && (
+                <SectionTitle title="Keahlian" />
+              ))}
             {skillsState?.categorized && skillsState.categorized.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -231,7 +230,7 @@ export const Template1 = React.forwardRef<HTMLDivElement, Template1Props>(
             )}
           </section>
         </div>
-      </div>
+      </>
     );
   },
 );

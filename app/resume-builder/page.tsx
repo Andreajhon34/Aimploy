@@ -108,8 +108,8 @@ export default function ResumeBuilderPage() {
           initial="hidden"
           animate="visible"
         >
-          <ScrollArea className="h-full px-4">
-            <div className="flex flex-col gap-4">
+          <ScrollArea className="h-full">
+            <div className="flex flex-col gap-4 px-4">
               <h1 className="text-xl font-bold my-3">Resume builder</h1>
               <PersonalInformationCard />
               <ExperienceCard />
@@ -131,7 +131,9 @@ export default function ResumeBuilderPage() {
           </Button>
         </div>
         <ScrollArea className="h-full w-[794px]">
-          <Template1 watch={methods.watch} ref={contentRef} />
+          <div className="size-full py-8 px-4 sm:px-8 flex justify-center">
+            <Template1 watch={methods.watch} ref={contentRef} />
+          </div>
           <ScrollBar orientation="vertical" />
         </ScrollArea>
       </FormProvider>
