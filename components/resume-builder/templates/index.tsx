@@ -57,7 +57,7 @@ export const Template1 = React.forwardRef<HTMLDivElement, Template1Props>(
         <div
           ref={ref}
           {...props}
-          className="resume-conf shadow-xl ring-1 ring-slate-900/5 text-slate-800 font-serif print:font-serif"
+          className="resume-conf shadow-xl ring-1 ring-slate-900/5 text-slate-800 font-sans print:font-sans"
         >
           {/* -- HEADER -- */}
           <header className="flex flex-col items-center sm:items-start text-center sm:text-left mb-6">
