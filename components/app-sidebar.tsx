@@ -80,11 +80,8 @@ const FeatureItems = () => {
 };
 
 export function AppSidebar() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -105,9 +102,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg">
+                <SidebarMenuButton>
                   <Settings />
-                  Settings
+                  <span>Settings</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
