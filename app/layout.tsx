@@ -15,6 +15,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -91,14 +93,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="flex flex-1 flex-col">
-              <SidebarTrigger />
-              {children}
-            </main>
-            <Toaster position="top-center" />
-          </SidebarProvider>
+          <TooltipProvider>
+            <SidebarProvider defaultOpen>
+              <AppSidebar />
+              <main className="flex flex-1 flex-col">
+                <SidebarTrigger />
+                {children}
+              </main>
+              <Toaster position="top-center" />
+            </SidebarProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

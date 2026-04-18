@@ -50,7 +50,7 @@ export default function HomePage() {
           variants={fadeUpVariant}
           className="text-lg md:text-md text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          Tinggalkan cara lama membuat resume. Aimployee secara otomatis
+          Tinggalkan cara lama membuat resume. Aimploy secara otomatis
           merapikan bahasa, mengelompokkan keahlian, dan mendesain CV Anda agar
           100% ramah ATS dalam hitungan detik.
         </motion.p>
