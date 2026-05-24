@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import { Sparkles, FileText, Zap, ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { EnhanceWithAiButton } from "@/components/ui/EnhanceWithAiButton";
 
 export default function HomePage() {
   const fadeUpVariant: Variants = {
@@ -27,7 +28,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center relative overflow-hidden">
       <div className="absolute top-1/4 left-1/4 w-[30rem] h-[30rem] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
-
       {/* --- MAIN KONTEN --- */}
       <motion.div
         className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-23"
@@ -50,9 +50,9 @@ export default function HomePage() {
           variants={fadeUpVariant}
           className="text-lg md:text-md text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          Tinggalkan cara lama membuat resume. Aimployee secara otomatis
-          merapikan bahasa, mengelompokkan keahlian, dan mendesain CV Anda agar
-          100% ramah ATS dalam hitungan detik.
+          Tinggalkan cara lama membuat resume. Aimploy secara otomatis merapikan
+          bahasa, mengelompokkan keahlian, dan mendesain CV Anda agar 100% ramah
+          ATS dalam hitungan detik.
         </motion.p>
 
         {/* CTA Buttons */}
