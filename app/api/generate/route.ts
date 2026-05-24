@@ -16,13 +16,16 @@ export async function POST(req: Request) {
       contents: prompt,
     });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        responseText: response.text,
+    return NextResponse.json(
+      {
+        success: true,
+        code: "SUCCESS",
+        message: "Prompt was successfull",
+        data: response.text,
       },
-    });
-  } catch (err: unknown) {
+      { status: 200 },
+    );
+  } catch (err) {
     if (err instanceof ApiError) {
       const allowedStatus = [429, 500, 503, 504];
 
@@ -30,20 +33,24 @@ export async function POST(req: Request) {
         const error = JSON.parse(err.message)["error"];
 
         if (allowedStatus.includes(err.status)) {
-          return NextResponse.json({
-            success: false,
-            code: error["status"],
-            message: error["message"],
-          });
+          return NextResponse.json(
+            {
+              success: false,
+              code: error["status"],
+              message: error["message"],
+              data: null,
+            },
+            { status: 500 },
+          );
         }
-      } catch (err: unknown) {
+      } catch (err) {
         console.error("Unexpected Error:", err);
         return NextResponse.json(
           {
             success: false,
             code: "Internal server error",
             message: "internal server error, please try again later",
-            stack: process.env.NODE_ENV === "development" ? err : undefined,
+            data: null,
           },
           { status: 500 },
         );
@@ -56,7 +63,7 @@ export async function POST(req: Request) {
         success: false,
         code: "Internal server error",
         message: "internal server error, please try again later",
-        stack: process.env.NODE_ENV === "development" ? err : undefined,
+        data: null,
       },
       { status: 500 },
     );

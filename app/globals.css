@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -14,6 +15,21 @@
   }
 }
 
+.resume-conf {
+  background-color: white;
+  color: black;
+  width: 100%;
+  max-width: 210mm; /* biar gak melebar di layar lebar */
+  min-height: 297mm; /* minimal 1 halaman A4 */
+  height: auto; /* tinggi ngikut konten */
+  padding: 20mm;
+  box-sizing: border-box;
+  margin: 0 auto; /* center di preview */
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
 @media print {
   @page {
     size: A4;
@@ -22,18 +38,13 @@
 
   .resume-conf {
     width: 210mm;
+    min-height: 297mm;
+    height: auto;
     box-shadow: none;
+    margin: 0;
+    padding: 20mm;
     line-height: 1.5;
   }
-}
-
-.resume-conf {
-  background-color: white;
-  color: black;
-  width: 100%;
-  height: 297mm;
-  padding: 20mm;
-  box-sizing: border-box;
 }
 
 @theme inline {
