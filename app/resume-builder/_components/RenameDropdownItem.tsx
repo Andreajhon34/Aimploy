@@ -42,14 +42,13 @@ export function RenameDropdownItem({
   };
 
   const handleRename = () => {
-    if (initialTitle === title) return setDropdownOpen(false);
+    setDropdownOpen(false);
+    if (initialTitle === title) return;
     startTransition(async () => {
       const res = await renameResume(resumeId, title);
       if (res.success) {
-        setDropdownOpen(false);
         toast.success(`${initialTitle} berhasil diganti ke ${title}`);
       } else {
-        setDropdownOpen(false);
         toast.error(
           `Terjadi kesalahan saat mengganti name ${initialTitle} ke ${title}`,
         );
