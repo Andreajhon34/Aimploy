@@ -72,9 +72,9 @@ export function ResumeBuilderForm({
     startTransition(async () => {
       const res = await saveResume(id, title, payload);
       if (res.success) {
-        toast.success("Saved");
+        toast.success("Berhasil disimpan.");
       } else {
-        toast.error("Error", { description: res.message });
+        toast.error("Terjadi kesalahan saat ingin menyimpan resume.");
       }
     });
   };

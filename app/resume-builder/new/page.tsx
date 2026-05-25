@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { ResumeBuilderDbSchema } from "@/app/resume-builder/_schemas/resumeBuilderDbForm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const baseTitle = "Untitled Resume";
 
