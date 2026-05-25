@@ -47,6 +47,12 @@ const PersonalInformationCard = ({ className }: { className?: string }) => {
       className: "col-span-1",
     },
     {
+      name: "location",
+      label: "Lokasi",
+      placeholder: "Jakarta Pusat, Indonesia",
+      className: "col-span-1",
+    },
+    {
       name: "describeProfile",
       label: "Ringkasan Profil",
       placeholder: "Enter your summary...",

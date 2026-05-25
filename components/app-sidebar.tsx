@@ -89,7 +89,7 @@ const FeatureItems = () => {
   const features = [
     { name: "Home", href: "/", Icon: Home },
     { name: "Resume builder", href: "/resume-builder", Icon: FileText },
-    { name: "ATS Checker", href: "/ats-checker", Icon: Search },
+    { name: "ATS Checker", href: "/ats", Icon: Search },
   ] as const;
   const { state } = useSidebar();
 
@@ -226,12 +226,13 @@ const SidebarFooterContent = () => {
   const { state } = useSidebar();
   const { data, isPending } = authClient.useSession();
 
-  if (isPending) return (
-    <div className="flex gap-2">
-      <Skeleton className="size-10 rounded-full shrink-0 grow-0" />
-      <Skeleton className="rounded-sm size-full" />
-    </div>
-  );
+  if (isPending)
+    return (
+      <div className="flex gap-2">
+        <Skeleton className="size-10 rounded-full shrink-0 grow-0" />
+        <Skeleton className="rounded-sm size-full" />
+      </div>
+    );
 
   if (data) return <UserProfile />;
 

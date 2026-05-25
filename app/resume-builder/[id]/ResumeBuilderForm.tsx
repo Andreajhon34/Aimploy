@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Printer, Save } from "lucide-react";
+import { ChevronDownIcon, Printer, Save } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
-import React from "react";
+import React, { startTransition } from "react";
 import EducationCard from "@/app/resume-builder/[id]/_components/educationCard";
 import ExperienceCard from "@/app/resume-builder/[id]/_components/experienceCard";
 import PersonalInformationCard from "@/app/resume-builder/[id]/_components/personalInformationCard";
@@ -21,6 +21,14 @@ import {
   ResumeBuilderSchema,
 } from "@/app/resume-builder/_schemas/resumeBuilderForm";
 import { Input } from "@/components/ui/input";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Card, CardContent } from "@/components/ui/card";
+import { renameResume } from "../_actions/renameResume";
+import { cn } from "@/lib/utils";
 
 type ResumeBuilderFormProps = {
   id: string;
@@ -31,6 +39,7 @@ type ResumeBuilderFormProps = {
 const PERSONAL_INFORMATION_DEFAULTS: PersonalInformationSchema = {
   fullName: "",
   email: "",
+  location: "",
   job: "",
   number: "",
   describeProfile: "",
@@ -53,9 +62,39 @@ export function ResumeBuilderForm({
     },
     mode: "onBlur",
   });
-  const [isSaving, startTransition] = React.useTransition();
+  const [isSaving, startSaveTransition] = React.useTransition();
+  const [isRenaming, startRenameTransition] = React.useTransition();
   const [title, setTitle] = React.useState(initialTitle);
-  const isValidTitle = title.length >= 2;
+  const isValidTitle = title.trim().length >= 2;
+  const [isMutatingTitle, setIsMutatingTitle] = React.useState(false);
+
+  const handleKeyDownTitle = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (title === initialTitle) return;
+      setIsMutatingTitle(false);
+      startRenameTransition(async () => {
+        const res = await renameResume(id, title);
+        if (res.success) {
+          toast.success("Berhasil mengubah nama.");
+        } else {
+          toast.error("Terjadi kesalahan saat mengubah nama.");
+        }
+      });
+    }
+  };
+
+  const handleOnBlurTitle = () => {
+    if (title === initialTitle) return;
+    setIsMutatingTitle(false);
+    startRenameTransition(async () => {
+      const res = await renameResume(id, title);
+      if (res.success) {
+        toast.success("Berhasil mengubah nama.");
+      } else {
+        toast.error("Terjadi kesalahan saat mengubah nama.");
+      }
+    });
+  };
 
   const contentRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -69,7 +108,7 @@ export function ResumeBuilderForm({
       return;
     }
 
-    startTransition(async () => {
+    startSaveTransition(async () => {
       const res = await saveResume(id, title, payload);
       if (res.success) {
         toast.success("Berhasil disimpan.");
@@ -99,21 +138,21 @@ export function ResumeBuilderForm({
       >
         <div className="bg-background sticky top-0 p-4 inset-x-0 border-b shadow-md flex justify-end items-center">
           {/* <h2 className="font-semibold text-2xl">Resume builder</h2> */}
-          <div className="absolute left-1/2 top-1/2 -translate-1/2">
-            <Input
-              className="
+          <div className="absolute left-1/2 top-1/2 -translate-1/2 font-semibold">
+            {isMutatingTitle ? (
+              <Input
+                className="
     rounded-none
-    font-semibold
 
     border-0
     border-b border-transparent
 
-    bg-transparent
+    text-lg!
+
+    bg-transparent!
     shadow-none
     ring-0!
     outline-none
-
-    text-lg!
 
     p-0
     h-auto
@@ -123,10 +162,25 @@ export function ResumeBuilderForm({
     focus-visible:border-input
     focus-visible:ring-0
   "
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              aria-invalid={!isValidTitle}
-            />
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                aria-invalid={!isValidTitle}
+                onBlur={handleOnBlurTitle}
+                onKeyDown={handleKeyDownTitle}
+                disabled={isRenaming || isSaving}
+                autoFocus
+              />
+            ) : (
+              <span
+                className={cn(
+                  "text-lg px-20 cursor-text",
+                  (isRenaming || isSaving) && "pointer-events-none opacity-50",
+                )}
+                onClick={() => setIsMutatingTitle(true)}
+              >
+                {title}
+              </span>
+            )}
           </div>
           <Button size="icon-lg" type="submit" disabled={isSaving}>
             <Save />
@@ -138,7 +192,21 @@ export function ResumeBuilderForm({
             <PersonalInformationCard />
             <ExperienceCard />
             <EducationCard />
-            <SkillCard />
+            <Card>
+              <CardContent>
+                <Collapsible className="rounded-md">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="plain" className="group w-full">
+                      Keahlian
+                      <ChevronDownIcon className="ml-auto group-data-[state=open]:rotate-180" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SkillCard />
+                  </CollapsibleContent>
+                </Collapsible>
+              </CardContent>
+            </Card>
           </FormProvider>
         </div>
       </motion.div>

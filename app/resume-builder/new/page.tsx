@@ -45,6 +45,7 @@ export default async function NewResumeBuilderPage() {
     personalInformation: {
       describeProfile: "",
       email: "",
+      location: "",
       fullName: "",
       job: "",
       linkedinProfile: "",

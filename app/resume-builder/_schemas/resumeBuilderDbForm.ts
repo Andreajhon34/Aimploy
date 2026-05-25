@@ -5,6 +5,7 @@ export const personalInformationDbSchema = z.object({
   job: z.string(),
   email: z.string(),
   number: z.string(),
+  location: z.string(),
   describeProfile: z.string(),
   linkedinProfile: z.string(),
 });
