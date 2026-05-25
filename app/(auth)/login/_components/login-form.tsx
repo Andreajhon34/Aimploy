@@ -97,16 +97,10 @@ export function LoginForm({
           </Field>
         </FieldGroup>
       </form>
-<<<<<<< HEAD
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-=======
       <FieldDescription className="px-6 text-center text-xs">
         By clicking continue, you agree to our{" "}
         <span className="font-bold ">Terms of Service</span> and{" "}
         <span className="font-bold">Privacy Policy</span>.
->>>>>>> 7c80933 (update auth pages and layouts)
       </FieldDescription>
     </div>
   );
