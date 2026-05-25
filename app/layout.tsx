@@ -36,39 +36,6 @@ export const metadata: Metadata = {
   description: "Aimploy is an AI-powered CV and Resume builder website ",
 };
 
-const MainNavbar = () => {
-  const navLinks = [
-    { href: "/product", name: "Products" },
-    { href: "/about", name: "About" },
-  ] as const;
-
-  return (
-    <header className="flex shrink-0">
-      <div className="flex flex-1 justify-between items-center container mx-auto px-3 py-4">
-        <h1>
-          <Link href="/" className="font-bold text-xl">
-            Aimploy
-          </Link>
-        </h1>
-        <NavigationMenu>
-          <NavigationMenuList>
-            {navLinks.map(({ href, name }) => (
-              <NavigationMenuItem key={href}>
-                <NavigationMenuLink
-                  asChild
-                  className={navigationMenuTriggerStyle()}
-                >
-                  <Link href={href}>{name}</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
-    </header>
-  );
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -87,7 +54,7 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body>
         <QueryProvider>
           <ThemeProvider
             attribute="class"
@@ -96,14 +63,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TooltipProvider>
-              <SidebarProvider defaultOpen>
-                <AppSidebar />
-                <main className="flex flex-1 flex-col">
-                  <SidebarTrigger />
-                  {children}
-                </main>
-                <Toaster position="bottom-center" />
-              </SidebarProvider>
+              <main className="flex flex-1 flex-col">{children}</main>
+              <Toaster position="bottom-center" />
             </TooltipProvider>
           </ThemeProvider>
         </QueryProvider>
