@@ -79,7 +79,7 @@ async function ResumeBuilderContent({ userId }: { userId: string }) {
           </div>
         ) : (
           /* Sub-state penampung jika data di DB benar-benar kosong */
-          <div className="text-center py-8 border border-dashed rounded-xl bg-muted/5">
+          <div className="text-center py-8 border mt-6 border-dashed rounded-xl bg-muted/5">
             <p className="text-xs text-muted-foreground">
               Belum ada riwayat pembuatan resume.
             </p>

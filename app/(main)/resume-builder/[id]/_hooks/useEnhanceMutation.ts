@@ -21,25 +21,25 @@ export const useEnhanceMutation = <TData, TVariables = void>({
     mutationFn,
     onError: (err) => {
       if (err instanceof HttpError) {
-        return toast.error("Failed to send request", {
+        return toast.error("Terjadi kesalahan saat mengirim prompt", {
           description: err.message,
         });
       }
 
       if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-        return toast.error("You are offline", {
-          description: "Check your internet connection",
+        return toast.error("Kamu sedang tidak terhubung ke internet", {
+          description: "Silahkan coba lagi nanti",
         });
       }
 
       if (err.name === "AbortError") {
-        return toast.error("Request timed out", {
-          description: "Please try again later",
+        return toast.error("Waktu timeout telah tercapai", {
+          description: "Silahkan coba lagi nanti",
         });
       }
 
-      toast.error("Something went wrong", {
-        description: "Please try again later",
+      toast.error("Sepertinya ada yang salah", {
+        description: "Silahkan coba lagi nanti",
       });
     },
     onSuccess,
