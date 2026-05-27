@@ -5,7 +5,7 @@ import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resume
 import { ResponseBody } from "@/types/responseBody";
 import { useFormContext } from "react-hook-form";
 import { useEnhanceMutation } from "./useEnhanceMutation";
-import { generateText } from "../_lib";
+import { generateText } from "../_lib/generateText";
 
 export const useSkillCard = () => {
   const { control, getValues, trigger, setError } =

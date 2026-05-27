@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { PrismaClient, Prisma } from "@/lib/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
@@ -11,7 +12,20 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  await prisma.resume.deleteMany();
+  // const resume = await prisma.resume.findFirst({
+  //   where: { userId: "d1yjLcGf1pnwHt8WlxXYDXtJTaez1hcd" },
+  // });
+
+  // const atsResult = await prisma.atsResult.findFirst({
+  //   where: { userId: "d1yjLcGf1pnwHt8WlxXYDXtJTaez1hcd" },
+  // });
+
+  // await prisma.atsResult.update({
+  //   where: { id: atsResult?.id },
+  //   data: { resumeId: resume?.id },
+  // });
+
+  await prisma.atsResult.deleteMany();
 }
 
 main()

@@ -1,18 +1,20 @@
-import { FileText } from "lucide-react";
+import { File, FileText, FileTextIcon } from "lucide-react";
 import {
   Field,
   FieldContent,
   FieldDescription,
+  FieldGroup,
   FieldLabel,
   FieldTitle,
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Resume } from "../_types/resume";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type ResumeListCardProps = {
   resumes: Resume[];
-  selectedResumeId: string | null;
+  selectedResumeId: string;
   setSelectedResumeId: (resumeId: string) => void;
 };
 
@@ -30,29 +32,39 @@ export function ResumeListCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="overflow-y-auto no-scrollbar">
-        <RadioGroup
+        <ToggleGroup
           value={selectedResumeId}
           onValueChange={setSelectedResumeId}
+          variant="outline"
+          type="single"
+          orientation="vertical"
+          className="w-full h-auto"
         >
           {resumes.map(({ title, resumeId, updatedAt }) => (
-            <FieldLabel htmlFor={resumeId}>
+            <ToggleGroupItem
+              key={resumeId}
+              className="h-auto w-full py-3"
+              value={resumeId}
+              aria-label={title}
+            >
               <Field orientation="horizontal">
-                <FieldContent>
-                  <FieldTitle>{title}</FieldTitle>
-                  <FieldDescription>
-                    Terakhir diperbaharui{" "}
-                    {updatedAt.toLocaleDateString("id-ID")}
-                  </FieldDescription>
-                </FieldContent>
-                <RadioGroupItem
-                  value={resumeId}
-                  id={resumeId}
-                  className="sr-only"
-                />
+                <FileTextIcon className="size-10" />
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldTitle>{title}</FieldTitle>
+                    <FieldDescription>
+                      Diperbaharui pada{" "}
+                      {updatedAt.toLocaleString("id-ID", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
               </Field>
-            </FieldLabel>
+            </ToggleGroupItem>
           ))}
-        </RadioGroup>
+        </ToggleGroup>
       </CardContent>
     </Card>
   );

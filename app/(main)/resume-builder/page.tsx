@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { Clock, FileText, Plus } from "lucide-react";
+import { Clock, Plus } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -125,7 +125,6 @@ function ResumeCard({ id, title, updatedAt }: ResumeCardProps) {
               <div className="h-1 bg-foreground/5 rounded-xs w-2/3" />
             </div>
           </div>
-          <FileText className="h-4 w-4 text-muted-foreground/40 self-end group-hover:text-primary/40 transition-colors" />
         </div>
 
         {/* Card Info */}
@@ -134,7 +133,7 @@ function ResumeCard({ id, title, updatedAt }: ResumeCardProps) {
             {title}
           </h3>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Diubah{" "}
+            Diperbaharui{" "}
             {updatedAt.toLocaleString("id-ID", {
               dateStyle: "medium",
               timeStyle: "short",
