@@ -58,7 +58,7 @@ export function DeleteDropdownItem({
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Title Baru</AlertDialogTitle>
+            <AlertDialogTitle>Hapus</AlertDialogTitle>
             <AlertDialogDescription>
               Aksi ini tidak dapat dikembalikan.
             </AlertDialogDescription>

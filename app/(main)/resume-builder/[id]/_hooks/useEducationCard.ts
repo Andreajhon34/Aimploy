@@ -1,7 +1,7 @@
 "use client";
 
 import { useEnhanceMutation } from "./useEnhanceMutation";
-import { generateText } from "../_lib";
+import { generateText } from "../_lib/generateText";
 
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";

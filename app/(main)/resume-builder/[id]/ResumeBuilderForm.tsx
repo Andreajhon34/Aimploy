@@ -8,7 +8,7 @@ import EducationCard from "@/app/(main)/resume-builder/[id]/_components/educatio
 import ExperienceCard from "@/app/(main)/resume-builder/[id]/_components/experienceCard";
 import PersonalInformationCard from "@/app/(main)/resume-builder/[id]/_components/personalInformationCard";
 import SkillCard from "@/app/(main)/resume-builder/[id]/_components/skillCard";
-import { Template1 } from "@/app/(main)/resume-builder/[id]/_components/templates";
+import { Template1 } from "@/app/(main)/resume-builder/[id]/_components/templates/Template1";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { useReactToPrint } from "react-to-print";
@@ -29,6 +29,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { renameResume } from "../_actions/renameResume";
 import { cn } from "@/lib/utils";
+import { TEMPLATES, TEMPLATES_NAME } from "./_lib/templates";
+import { TemplateDialog } from "./_components/TemplatesDialog";
 
 type ResumeBuilderFormProps = {
   id: string;
@@ -51,7 +53,7 @@ export function ResumeBuilderForm({
   id,
   title: initialTitle,
 }: ResumeBuilderFormProps) {
-  const methods = useForm<ResumeBuilderSchema>({
+  const form = useForm<ResumeBuilderSchema>({
     resolver: zodResolver(resumeBuilderSchema),
     defaultValues: {
       personalInformation:
@@ -67,6 +69,8 @@ export function ResumeBuilderForm({
   const [title, setTitle] = React.useState(initialTitle);
   const isValidTitle = title.trim().length >= 2;
   const [isMutatingTitle, setIsMutatingTitle] = React.useState(false);
+  const [template, setTemplate] = React.useState<TEMPLATES_NAME>("classic");
+  const ActiveTemplate = TEMPLATES[template];
 
   const handleKeyDownTitle = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -100,6 +104,11 @@ export function ResumeBuilderForm({
 
   const handlePrint = useReactToPrint({
     contentRef,
+    pageStyle: `
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  `,
   });
 
   const onSubmit = (payload: ResumeBuilderSchema) => {
@@ -121,7 +130,7 @@ export function ResumeBuilderForm({
   return (
     <form
       className="flex flex-row bg-background h-screen w-full"
-      onSubmit={methods.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(onSubmit)}
     >
       <motion.div
         className="flex-1 relative no-scrollbar h-full overflow-y-auto scroll"
@@ -182,13 +191,14 @@ export function ResumeBuilderForm({
               </span>
             )}
           </div>
+          <TemplateDialog setTemplate={setTemplate} />
           <Button size="icon-lg" type="submit" disabled={isSaving}>
             <Save />
             <span className="sr-only">save resume</span>
           </Button>
         </div>
         <div className="flex flex-col gap-4 p-4 relative max-w-3xl left-1/2 -translate-x-1/2">
-          <FormProvider {...methods}>
+          <FormProvider {...form}>
             <PersonalInformationCard />
             <ExperienceCard />
             <EducationCard />
@@ -214,13 +224,24 @@ export function ResumeBuilderForm({
         onClick={handlePrint}
         className="shadow-lg h-16 w-42 absolute bottom-12 right-8 z-50"
         variant="secondary"
+        type="button"
       >
         <Printer className="size-6 mr-2" />
         Export to PDF
       </Button>
       <div className="flex-1 h-full no-scrollbar overflow-y-auto">
-        <div className="p-8">
-          <Template1 watch={methods.watch} ref={contentRef} />
+        <div
+          ref={contentRef}
+          className="
+      w-[210mm] min-h-[297mm] bg-white p-[20mm] shadow-2xl border transition-all duration-300 relative
+
+      bg-[linear-gradient(to_bottom,transparent_296mm,rgba(239,68,68,0.4)_296mm,rgba(239,68,68,0.4)_297mm)]
+      bg-[size:100%_297mm]
+      
+      print:shadow-none print:border-none print:bg-none print:w-full
+    "
+        >
+          <ActiveTemplate watch={form.watch} />
         </div>
       </div>
     </form>

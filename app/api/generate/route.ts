@@ -1,9 +1,6 @@
-import { GoogleGenAI, ApiError } from "@google/genai";
 import { NextResponse } from "next/server";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+import { ai } from "@/lib/gemini";
+import { ApiError } from "@google/genai";
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +25,6 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof ApiError) {
       const allowedStatus = [429, 500, 503, 504];
-
       try {
         const error = JSON.parse(err.message)["error"];
 

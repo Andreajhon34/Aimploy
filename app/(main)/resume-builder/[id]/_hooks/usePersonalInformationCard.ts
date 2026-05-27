@@ -3,7 +3,7 @@
 import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import { useFormContext } from "react-hook-form";
 import { useEnhanceMutation } from "./useEnhanceMutation";
-import { generateText } from "../_lib";
+import { generateText } from "../_lib/generateText";
 
 export const usePersonalInformationCard = () => {
   const { control, getValues, trigger } = useFormContext<ResumeBuilderSchema>();

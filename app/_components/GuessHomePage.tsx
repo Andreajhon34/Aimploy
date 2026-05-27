@@ -1,9 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { FieldSeparator } from "@/components/ui/field";
 import { motion, Variants } from "framer-motion";
 import { ArrowRight, FileText, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
+import { Separator } from "react-resizable-panels";
 
 // Animasi Variants
 const containerVariants: Variants = {
@@ -34,28 +36,9 @@ export function GuestHomePage() {
       <div className="absolute top-1/4 left-1/4 w-[35rem] h-[35rem] bg-primary/10 blur-[130px] rounded-full pointer-events-none animate-pulse duration-[8s]" />
       <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none animate-pulse duration-[12s]" />
 
-      {/* 2. AUTH HEADER (Menggunakan struktur container standar) */}
-      <header className="fixed top-0 inset-x-0">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-end">
-          <div className="flex items-center gap-3">
-            <Button size="sm" asChild className="rounded-full shadow-xs px-4">
-              <Link href="/signup">Sign up</Link>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="hover:bg-muted/50 rounded-full px-4"
-            >
-              <Link href="/login">Log in</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       {/* 3. MAIN KONTEN (Konsisten dengan container & max-width halaman workspace) */}
       <motion.div
-        className="container mx-auto px-4 max-w-4xl relative z-10 text-center pt-36 pb-24 flex flex-col items-center"
+        className="container mx-auto px-4 relative z-10 text-center pt-36 pb-24 flex flex-col items-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -92,15 +75,24 @@ export function GuestHomePage() {
 
         {/* Restorasi & Upgrade CTA Button */}
         <motion.div variants={itemVariants} className="w-full sm:w-auto">
-          <Link href="/resume-builder" className="block">
+          <div className="flex items-center gap-3 flex-col">
             <Button
               size="lg"
-              className="h-12 sm:h-13 px-8 text-sm sm:text-base font-medium rounded-full group transition-all duration-300 shadow-md shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 hover:scale-[1.01]"
+              asChild
+              className="rounded-full h-10 w-64 px-4 text-lg"
             >
-              Buat Resume Sekarang
-              <ArrowRight className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <Link href="/signup">Sign up</Link>
             </Button>
-          </Link>
+            <span className="uppercase font-semibold">or</span>
+            <Button
+              variant="secondary"
+              size="lg"
+              asChild
+              className="rounded-full px-4 h-10 w-64 px-4 text-lg"
+            >
+              <Link href="/login">Log in</Link>
+            </Button>
+          </div>
         </motion.div>
 
         {/* --- FITUR GRID --- */}

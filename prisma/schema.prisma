@@ -23,6 +23,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   resumes       Resume[]
+  atsResult     AtsResult[]
 
   @@unique([email])
   @@map("user")
@@ -81,7 +82,18 @@ model Resume {
   userId    String 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
-  data      Json 
+  data      Json
+  atsResult AtsResult[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AtsResult {
+  id String @id @default(cuid())
+  userId String
+  user  User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeId String
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  content Json
+  createdAt DateTime @default(now())
 }
