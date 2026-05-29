@@ -18,8 +18,8 @@ export async function fetcher<T>(
 
   try {
     const res = await fetch(input, {
-      ...init,
       signal: controller.signal,
+      ...init,
       headers: {
         "Content-Type": "application/json",
         ...headers,

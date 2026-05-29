@@ -27,7 +27,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ResumeBuilderDbSchema } from "../../resume-builder/_schemas/resumeBuilderDbForm";
 import { ResumeListCard } from "./ResumeListCard";
-import { Resume } from "../_types/resume";
+import { Resume } from "../../../_types/resume";
 import { fetcher } from "@/lib/fetcher";
 import { ResponseBody } from "@/types/responseBody";
 import { HttpError } from "@/lib/HttpError";

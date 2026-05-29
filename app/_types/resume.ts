@@ -1,4 +1,4 @@
-import { ResumeBuilderDbSchema } from "../../resume-builder/_schemas/resumeBuilderDbForm";
+import { ResumeBuilderDbSchema } from "../(main)/resume-builder/_schemas/resumeBuilderDbForm";
 
 export type Resume = {
   resumeId: string;

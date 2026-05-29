@@ -1,7 +1,7 @@
 "use client";
 
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { FileText, Home, Search } from "lucide-react";
+import { FileText, Home, ScrollText, Search } from "lucide-react";
 import Link from "next/link";
 
 export const NavItems = () => {
@@ -9,6 +9,7 @@ export const NavItems = () => {
     { name: "Home", href: "/", Icon: Home },
     { name: "Resume builder", href: "/resume-builder", Icon: FileText },
     { name: "ATS Checker", href: "/ats", Icon: Search },
+    { name: "Cover letter", href: "/cover-letter", Icon: ScrollText },
   ] as const;
 
   return features.map(({ name, href, Icon }) => (
