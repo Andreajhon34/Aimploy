@@ -13,27 +13,18 @@ import { ChevronDownIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { resumeBuilderDbSchema } from "../resume-builder/_schemas/resumeBuilderDbForm";
-import { CoverLetterTabClient } from "./_components/CoverLetterTabClient";
+import {
+  CoverLetterTabClient,
+  CoverLetterTabClientProps,
+} from "./_components/CoverLetterTabClient";
 import { CreateTabClient } from "./_components/CreateTabClient";
+import {
+  FAQCollapsibleSection,
+  FAQItem,
+} from "@/app/_components/FAQCollapsible";
+import { CoverLetter } from "./_types/CoverLetter";
 
-function CoverLetterTabClientSkeleton() {
-  return (
-    <Card className="size-full">
-      <CardContent className="size-full">
-        <div className="size-full flex flex-col gap-4">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <div className="flex flex-col size-full gap-2" key={index}>
-              <Skeleton className="flex-1 w-full" />
-              <Skeleton className="flex-1 w-[70%]" />
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-const FAQ_ITEMS = [
+const COVER_LETTER_FAQ: FAQItem[] = [
   {
     question: "Apakah data resume saya aman di sini?",
     answer:
@@ -62,6 +53,10 @@ const FAQ_ITEMS = [
   },
 ];
 
+type AwaitedResumesPromise = Awaited<
+  CoverLetterTabClientProps["resumesPromise"]
+>;
+
 export default async function CoverLetterPage() {
   const session = await getSession();
 
@@ -82,25 +77,41 @@ export default async function CoverLetterPage() {
       }),
     );
 
-  const coverLettersPromises = prisma.coverLetter
+  const coverLettersPromises = prisma.resume
     .findMany({
-      where: { resume: { userId } },
+      where: { userId, coverLetter: { some: {} } },
       select: {
+        coverLetter: {
+          select: {
+            resume: { select: { title: true, data: true } },
+            id: true,
+            content: true,
+            createdAt: true,
+          },
+        },
         id: true,
-        content: true,
-        createdAt: true,
-        resume: true,
+        title: true,
       },
     })
-    .then((coverLetters) =>
-      coverLetters.map(({ resume, ...props }) => {
-        const parsedData = resumeBuilderDbSchema.parse(resume.data);
-        const newResume = {
-          ...resume,
-          resumeId: resume.id,
-          content: parsedData,
+    .then((resume) =>
+      resume.map(({ coverLetter: rawCoverLetters, ...props }) => {
+        const coverLetters: AwaitedResumesPromise[number]["coverLetters"] =
+          rawCoverLetters.map(({ resume, ...props }) => {
+            const parsedData = resumeBuilderDbSchema.parse(resume.data);
+            const { email, fullName, number } = parsedData.personalInformation;
+            return {
+              ...props,
+              resumeTitle: resume.title,
+              personalInfo: { email, fullName, phone: number },
+            };
+          });
+
+        const result: AwaitedResumesPromise[number] = {
+          ...props,
+          coverLetters,
+          resumeId: props.id,
         };
-        return { ...props, resume: newResume };
+        return result;
       }),
     );
 
@@ -115,34 +126,11 @@ export default async function CoverLetterPage() {
           <CreateTabClient resumesPromise={resumesPromise} />
         </TabsContent>
         <TabsContent value="myCoverLetter" className="size-full min-h-0">
-          <Suspense fallback={<CoverLetterTabClientSkeleton />}>
-            <CoverLetterTabClient coverLettersPromise={coverLettersPromises} />
-          </Suspense>
+          <CoverLetterTabClient resumesPromise={coverLettersPromises} />
         </TabsContent>
       </Tabs>
 
-      <section className="flex w-full flex-col gap-4">
-        <h1 className="font-semibold text-4xl w-full text-center">FAQ</h1>
-        <div className="flex flex-none w-full flex-col gap-4">
-          {FAQ_ITEMS.map(({ question, answer }, index) => (
-            <Card className="w-full" key={index}>
-              <CardContent>
-                <Collapsible>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="plain" size="lg" className="group w-full">
-                      {question}
-                      <ChevronDownIcon className="ml-auto group-data-[state=open]:rotate-180" />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="px-2.5 py-3">
-                    {answer}
-                  </CollapsibleContent>
-                </Collapsible>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <FAQCollapsibleSection FAQItems={COVER_LETTER_FAQ} />
     </div>
   );
 }

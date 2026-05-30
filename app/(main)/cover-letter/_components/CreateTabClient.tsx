@@ -23,60 +23,36 @@ import { HttpError } from "@/lib/HttpError";
 import { ResponseBody } from "@/types/responseBody";
 import { useMutation } from "@tanstack/react-query";
 import { Sparkle, Square } from "lucide-react";
-import React, { Suspense } from "react";
+import React from "react";
 import { toast } from "sonner";
 import { saveCoverLetter } from "../_actions/saveCoverLetter";
-import { SortType } from "../_types/sortType";
-import { CoverLetterPreview } from "./CoverLetterPreview";
-import { ResumeList } from "./ResumeList";
-import { ResumeListView } from "./ResumeListView";
+import { ResumeCard } from "@/app/_components/resumeList/ResumeCard";
 import { CoverLetterPreviewClient } from "./CoverLetterPreviewClient";
-import { Skeleton } from "@/components/ui/skeleton";
+import SlideTextButton from "@/components/kokonutui/slide-text-button";
+import { toastApiError } from "@/app/_lib/toastApiError";
 
 type CreateTableClient = {
-  resumesPromise: Promise<Array<Resume & { createdAt: Date }>>;
+  resumesPromise: Promise<Array<Resume>>;
 };
 
 export function CreateTabClient({ resumesPromise }: CreateTableClient) {
-  // const resumes = React.use(resumesPromise);
-  // const resumeMap = new Map(resumes.map((resume) => [resume.resumeId, resume]));
-  const [selectedResumeId, setSelectedResumeId] = React.useState("");
-  const hasResumeSelected = !!selectedResumeId;
+  const [selectedResume, setSelectedResume] = React.useState<Resume | null>(
+    null,
+  );
+  const hasResumeSelected = !!selectedResume;
   const [jobDescription, setJobDescription] = React.useState("");
-  // const hasResumes = resumes.length > 0;
   const [coverLetterContent, setCoverLetterContent] = React.useState<
     string | null
   >(null);
   const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
-  // const selectedResume = resumeMap.get(selectedResumeId);
-  // const [sortBy, setSortBy] = React.useState<SortType>("latest");
-
-  // const sortedResume = React.useMemo(() => {
-  //   return [...resumes].sort((a, b) => {
-  //     if (sortBy === "ascending") {
-  //       return a.title.localeCompare(b.title);
-  //     }
-
-  //     if (sortBy === "descending") {
-  //       return b.title.localeCompare(a.title);
-  //     }
-
-  //     if (sortBy === "latest") {
-  //       return (
-  //         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  //       );
-  //     }
-  //     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-  //   });
-  // }, [sortBy, resumes]);
 
   const mutation = useMutation({
     mutationFn: async (prompt: string) => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      const timeoutId = setTimeout(() => controller.abort("timeout"), 10_000);
+      const timeoutId = setTimeout(() => controller.abort("timeout"), 60_000);
       timeoutIdRef.current = timeoutId;
 
       try {
@@ -93,52 +69,15 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
     onSuccess: (data) => {
       setCoverLetterContent(data);
       React.startTransition(async () => {
-        await saveCoverLetter(data, selectedResumeId);
+        if (!selectedResume) throw new Error("Resume not found");
+        await saveCoverLetter(data, selectedResume.resumeId);
       });
     },
-    onError: (err: unknown) => {
-      if (err instanceof HttpError) {
-        return toast.error("Terjadi kesalahan saat mengirim prompt", {
-          description: err.message,
-        });
-      }
-
-      if (err instanceof TypeError && !navigator.onLine) {
-        return toast.error("Kamu sedang tidak terhubung ke internet", {
-          description: "Silahkan coba lagi nanti",
-        });
-      }
-
-      /// AbortController with reason throws the reason value directly
-      if (
-        (err instanceof Error && err.name === "AbortError") ||
-        err === "user" ||
-        err === "timeout"
-      ) {
-        if (abortControllerRef.current?.signal.reason === "timeout") {
-          toast.error("Waktu timeout telah tercapai", {
-            description: "Silahkan coba lagi nanti",
-          });
-        }
-        abortControllerRef.current = null;
-        return;
-      }
-
-      if (err instanceof Error) {
-        return toast.error(err.message);
-      }
-
-      toast.error("Sepertinya ada yang salah", {
-        description: "Silahkan coba lagi nanti",
-      });
-    },
+    onError: (err: unknown) => toastApiError(err, abortControllerRef),
   });
 
   const handleGenerate = async () => {
     const resumes = await resumesPromise;
-    const selectedResume = resumes.find(
-      ({ resumeId }) => resumeId === selectedResumeId,
-    );
 
     if (!selectedResume)
       return toast.error("Mohon untuk memilih resume terlebih dahulu");
@@ -205,6 +144,7 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
   const handleCancelGenerate = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort("user");
+      abortControllerRef.current = null;
 
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
@@ -237,26 +177,22 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
           </DialogHeader>
 
           <div className="overflow-y-auto no-scrollbar">
-            {coverLetterContent && (
-              <Suspense fallback={<></>}>
-                <CoverLetterPreviewClient
-                  coverLetterContent={coverLetterContent}
-                  resumePromise={resumesPromise}
-                  selectedResumeId={selectedResumeId}
-                />
-              </Suspense>
+            {coverLetterContent && selectedResume && (
+              <CoverLetterPreviewClient
+                coverLetterContent={coverLetterContent}
+                selectedResume={selectedResume}
+              />
             )}
           </div>
         </DialogContent>
       </Dialog>
       <div className="size-full grid grid-cols-2 grid-rows-[1fr_auto] gap-4">
-        <Suspense fallback={<Skeleton className="size-full" />}>
-          <ResumeListView
+        <div className="min-h-0">
+          <ResumeCard
             resumesPromise={resumesPromise}
-            selectedResumeId={selectedResumeId}
-            setSelectedResumeId={setSelectedResumeId}
+            setSelectedResume={setSelectedResume}
           />
-        </Suspense>
+        </div>
         <div>
           <Card className="size-full">
             <CardHeader>
@@ -279,14 +215,17 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
         </div>
         <div className="col-span-2">
           {!mutation.isPending ? (
-            <ButtonWithLoading
+            <SlideTextButton
               className="w-full h-10"
               disabled={!hasResumeSelected}
-              isLoading={mutation.isPending}
               onClick={handleGenerate}
-            >
-              <Sparkle /> Generate
-            </ButtonWithLoading>
+              text={<Sparkle />}
+              hoverText={
+                <>
+                  Generate with <span className="font-bold">Aimploy</span>
+                </>
+              }
+            />
           ) : (
             <Button className="w-full h-10" onClick={handleCancelGenerate}>
               <Square />

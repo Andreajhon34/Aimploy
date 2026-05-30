@@ -1,28 +1,17 @@
 "use client";
 
 import { Resume } from "@/app/_types/resume";
-import { CoverLetter } from "../_types/CoverLetter";
 import { CoverLetterPreview } from "./CoverLetterPreview";
-import React from "react";
 
 type CoverLetterPreviewClientProps = {
   coverLetterContent: string;
-  selectedResumeId: string;
-  resumePromise: Promise<Array<Resume & { createdAt: Date }>>;
+  selectedResume: Resume;
 };
 
 export function CoverLetterPreviewClient({
   coverLetterContent,
-  selectedResumeId,
-  resumePromise,
+  selectedResume,
 }: CoverLetterPreviewClientProps) {
-  const resumes = React.use(resumePromise);
-  const selectedResume = resumes.find(
-    ({ resumeId }) => resumeId === selectedResumeId,
-  );
-
-  if (!selectedResume) throw Error("Resume not found");
-
   return (
     <CoverLetterPreview
       content={coverLetterContent}

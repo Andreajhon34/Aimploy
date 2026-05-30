@@ -2,7 +2,7 @@ import React from "react";
 import DOMPurify from "dompurify";
 
 type CoverLetterPreviewProps = {
-  content: string; // Teks HTML dari AI
+  content: string;
   personalInfo: {
     fullName: string;
     email: string;

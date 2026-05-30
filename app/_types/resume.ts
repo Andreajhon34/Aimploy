@@ -5,4 +5,5 @@ export type Resume = {
   title: string;
   content: ResumeBuilderDbSchema;
   updatedAt: Date;
+  createdAt: Date;
 };

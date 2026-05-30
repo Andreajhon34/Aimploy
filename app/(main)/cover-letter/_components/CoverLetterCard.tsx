@@ -36,13 +36,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteCoverLetter } from "../_actions/deleteCoverLetter";
 import { toast } from "sonner";
+import { count } from "console";
 
 type CoverLetterCardProps = {
-  coverLetter: CoverLetter & { id: string };
-  resume: Resume & { createdAt: Date };
+  coverLetter: CoverLetter;
+  resumeTitle: string;
+  count: number;
 };
 
-export function CoverLetterCard({ coverLetter, resume }: CoverLetterCardProps) {
+export function CoverLetterCard({
+  coverLetter,
+  resumeTitle,
+  count,
+}: CoverLetterCardProps) {
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const [isDeleting, startDeleting] = React.useTransition();
 
@@ -73,7 +79,7 @@ export function CoverLetterCard({ coverLetter, resume }: CoverLetterCardProps) {
     <>
       <div className="w-full flex flex-col p-0.5">
         {" "}
-        <Card className="relative size-full">
+        <Card className="relative size-full ring-0 bg-muted/20">
           <CardContent className="grid grid-cols-[1fr_auto] grid-rows-2 gap-y-2">
             <Dialog>
               {/* 
@@ -98,8 +104,8 @@ export function CoverLetterCard({ coverLetter, resume }: CoverLetterCardProps) {
 
               <DialogTrigger asChild>
                 <div>
-                  <p className="text-sm font-semibold cursor-pointer">
-                    Dari: {resume.title}
+                  <p className="text-sm truncate font-semibold cursor-pointer">
+                    {resumeTitle} {count}
                   </p>
                 </div>
               </DialogTrigger>
@@ -129,9 +135,9 @@ export function CoverLetterCard({ coverLetter, resume }: CoverLetterCardProps) {
                 </div>
               </DialogContent>
             </Dialog>
-            <div className="colxxxxxxxx-start-1 row-start-2">
+            <div className="col-start-1 row-start-2">
               <p className="text-sm text-muted-foreground">
-                Diperbaharui: {dateToLocalString(resume.createdAt)}
+                Dibuat: {dateToLocalString(coverLetter.createdAt)}
               </p>
             </div>
             <div className="row-span-2 col-start-2 row-start-1 self-center">
@@ -160,7 +166,7 @@ export function CoverLetterCard({ coverLetter, resume }: CoverLetterCardProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah kamu yakin ingin menghapus cover letter ini?
+              Apakah kamu yakin ingin menghapus?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
