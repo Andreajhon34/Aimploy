@@ -14,7 +14,7 @@ import {
   AtsResultListTabClient,
   AtsResultListTabClientProps,
 } from "./_components/AtsResultTabClient";
-import { AtsResult } from "./_types/AtsResult";
+import { AtsResult } from "./_types/atsResult";
 
 const ATS_CHECKER_FAQ: FAQItem[] = [
   {
@@ -56,23 +56,6 @@ export default async function AtsPage() {
   if (!session) {
     return redirect("/login");
   }
-
-  // const atsResultsPromise = prisma.atsResult
-  //   .findMany({
-  //     where: { userId: session.user.id },
-  //     select: {
-  //       content: true,
-  //       id: true,
-  //       createdAt: true,
-  //       resume: { select: { title: true } },
-  //     },
-  //   })
-  //   .then((atsResult) =>
-  //     atsResult.map(({ id, content, createdAt, resume: { title } }) => {
-  //       const jsonContent = content as unknown as AtsResult;
-  //       return { ...jsonContent, id, createdAt, resumeTitle: title, atsResult };
-  //     }),
-  //   );
 
   const atsResultsPromise = prisma.resume
     .findMany({

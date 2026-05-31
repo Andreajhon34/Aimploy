@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { dateToLocalString } from "@/app/_lib/dateToLocalString";
+import { Template1Preview } from "@/app/(main)/resume-builder/_components/Template1Preview";
 
 type ResumeListCardProps = {
   resumes: Resume[];
@@ -71,11 +72,18 @@ export function ResumeList({
             asChild
           >
             <Card className="w-full">
-              <CardContent className="w-full flex flex-col">
-                <p className="text-sm font-semibold">{title}</p>
-                <p className="text-sm text-muted-foreground">
-                  Diperbaharui pada {dateToLocalString(updatedAt)}
-                </p>
+              <CardContent className="w-full grid grid-cols-[40px_1fr] grid-rows-2 gap-x-3">
+                <div className="row-span-2 overflow-hidden">
+                  <Template1Preview className="w-full aspect-square blur-[2px]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold truncate">{title}</p>
+                </div>
+                <div className="col-start-2 min-w-0">
+                  <p className="text-sm truncate text-muted-foreground">
+                    Diupdate pada {dateToLocalString(updatedAt)}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </ToggleGroupItem>

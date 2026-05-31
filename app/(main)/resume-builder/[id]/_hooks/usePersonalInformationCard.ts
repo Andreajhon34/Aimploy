@@ -1,12 +1,17 @@
 "use client";
 
-import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
+import {
+  PersonalInformationSchema,
+  personalInformationSchema,
+  ResumeBuilderSchema,
+} from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import { useFormContext } from "react-hook-form";
-import { useEnhanceMutation } from "./useEnhanceMutation";
 import { generateText } from "../_lib/generateText";
+import { useEnhanceMutation } from "./useEnhanceMutation";
 
 export const usePersonalInformationCard = () => {
-  const { control, getValues, trigger } = useFormContext<ResumeBuilderSchema>();
+  const { control, getValues, setError } =
+    useFormContext<ResumeBuilderSchema>();
 
   const { mutate, ...props } = useEnhanceMutation({
     onMutation: generateText,
@@ -20,17 +25,41 @@ export const usePersonalInformationCard = () => {
   });
 
   const handleOnClick = async () => {
-    const isValid = await trigger([
-      "personalInformation.fullName",
-      "personalInformation.job",
-      "personalInformation.email",
-      "personalInformation.number",
-    ]);
+    const {
+      fullName,
+      job,
+      email,
+      number,
+      location,
+      linkedinProfile,
+      describeProfile,
+    } = getValues("personalInformation");
 
-    if (!isValid) return;
+    const zodResult = personalInformationSchema.safeParse({
+      fullName,
+      job,
+      email,
+      number,
+      linkedinProfile,
+      describeProfile,
+      location,
+    });
 
-    const { fullName, job, email, number, linkedinProfile, describeProfile } =
-      getValues("personalInformation");
+    if (!zodResult.success) {
+      zodResult.error.issues.forEach((issue) => {
+        const subFieldName = issue.path.join(".");
+
+        setError(
+          `personalInformation.${subFieldName as keyof PersonalInformationSchema}`,
+          {
+            type: "aiValidation",
+            message: issue.message,
+          },
+        );
+      });
+
+      return;
+    }
 
     const prompt = `
 Buat ringkasan profil profesional 2-3 kalimat untuk bagian "Summary" di resume.
@@ -38,6 +67,7 @@ Buat ringkasan profil profesional 2-3 kalimat untuk bagian "Summary" di resume.
 Data kandidat:
 - Nama: ${fullName}
 - Posisi: ${job}
+- Lokasi: ${location}
 - LinkedIn: ${linkedinProfile || "[KOSING]"}
 - Ringkasan awal dari kandidat: "${describeProfile || "[KOSONG]"}"
 - Email: ${email}

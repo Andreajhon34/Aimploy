@@ -2,12 +2,16 @@
 
 import { useEnhanceMutation } from "./useEnhanceMutation";
 import { generateText } from "../_lib/generateText";
-
+import {
+  eduationSchema,
+  EducationSchema,
+} from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 
 export const useEducationCard = () => {
-  const { control, getValues, trigger } = useFormContext<ResumeBuilderSchema>();
+  const { control, getValues, setError } =
+    useFormContext<ResumeBuilderSchema>();
   const { fields, remove, append } = useFieldArray({
     control,
     name: "educations",
@@ -25,17 +29,32 @@ export const useEducationCard = () => {
   });
 
   const handleOnClick = async (index: number) => {
-    const isValid = await trigger([
-      `educations.${index}.startYear`,
-      `educations.${index}.degree`,
-      `educations.${index}.endYear`,
-      `educations.${index}.institute`,
-    ]);
-    if (!isValid) return;
-
     const { degree, endYear, institute, startYear, description } = getValues(
       `educations.${index}`,
     );
+
+    const zodResult = eduationSchema.safeParse({
+      degree,
+      endYear,
+      institute,
+      startYear,
+      description,
+    });
+
+    if (!zodResult.success) {
+      zodResult.error.issues.forEach((issue) => {
+        const subFieldName = issue.path.join(".");
+        setError(
+          `educations.${index}.${subFieldName as keyof EducationSchema}`,
+          {
+            type: "aiValidation",
+            message: issue.message,
+          },
+        );
+      });
+
+      return;
+    }
 
     const prompt = `
 Buat 1-2 kalimat deskripsi pendidikan untuk resume.

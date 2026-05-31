@@ -22,7 +22,7 @@ import {
   FAQCollapsibleSection,
   FAQItem,
 } from "@/app/_components/FAQCollapsible";
-import { CoverLetter } from "./_types/CoverLetter";
+import { CoverLetter } from "./_types/coverLetter";
 
 const COVER_LETTER_FAQ: FAQItem[] = [
   {

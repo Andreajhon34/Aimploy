@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle2, Sparkles, XCircle } from "lucide-react";
 import { motion, useMotionValue, useTransform, Variants } from "motion/react";
 import { useState } from "react";
-import { AtsResult } from "../_types/AtsResult";
+import { AtsResult } from "../_types/atsResult";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type AtsScoreDisplayProps = {

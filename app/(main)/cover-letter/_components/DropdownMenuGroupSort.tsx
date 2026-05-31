@@ -9,7 +9,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SortType } from "../_types/sortType";
+import { SortType } from "../../../_types/sortType";
 
 type DropdownMenuGroupSortProps = {
   setSortBy: (value: SortType) => void;

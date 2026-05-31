@@ -30,6 +30,10 @@ import { ResumeCard } from "@/app/_components/resumeList/ResumeCard";
 import { CoverLetterPreviewClient } from "./CoverLetterPreviewClient";
 import SlideTextButton from "@/components/kokonutui/slide-text-button";
 import { toastApiError } from "@/app/_lib/toastApiError";
+import {
+  personalInformationSchema,
+  resumeBuilderSchema,
+} from "../../resume-builder/_schemas/resumeBuilderForm";
 
 type CreateTableClient = {
   resumesPromise: Promise<Array<Resume>>;
@@ -68,6 +72,7 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
     },
     onSuccess: (data) => {
       setCoverLetterContent(data);
+      toast.success("Cover letter berhasil dibuat");
       React.startTransition(async () => {
         if (!selectedResume) throw new Error("Resume not found");
         await saveCoverLetter(data, selectedResume.resumeId);
@@ -77,12 +82,20 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
   });
 
   const handleGenerate = async () => {
-    const resumes = await resumesPromise;
-
     if (!selectedResume)
-      return toast.error("Mohon untuk memilih resume terlebih dahulu");
+      throw new Error("Mohon untuk memilih resume terlebih dahulu");
 
     if (!selectedResume) throw Error("Resume could not be found");
+
+    const zodResult = personalInformationSchema.safeParse(
+      selectedResume.content.personalInformation,
+    );
+
+    if (!zodResult.success) {
+      return toast.error(
+        "Resume tidak lengkap, Mohon untuk mengisi minimal bagian informasi pribadi",
+      );
+    }
 
     const resumeText = `
     Name: ${selectedResume.content.personalInformation.fullName ?? ""}

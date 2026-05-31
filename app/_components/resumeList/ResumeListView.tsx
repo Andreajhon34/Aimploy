@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ResumeList } from "./ResumeList";
 import { Resume } from "@/app/_types/resume";
 import React from "react";
-import { SortType } from "../../(main)/cover-letter/_types/sortType";
+import { SortType } from "../../_types/sortType";
 
 type ResumeListViewProps = {
   resumePromise: Promise<Resume[]>;

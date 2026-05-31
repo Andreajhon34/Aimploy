@@ -29,7 +29,7 @@ import { Ellipsis } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import { deleteAtsResult } from "../_actions/deleteAtsResult";
-import { AtsResult } from "../_types/AtsResult";
+import { AtsResult } from "../_types/atsResult";
 import { AtsScoreDisplay } from "./AtsScoreDisplay";
 
 type AtsResultCardProps = {

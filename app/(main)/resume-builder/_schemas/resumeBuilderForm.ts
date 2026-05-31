@@ -28,11 +28,13 @@ export const eduationSchema = z.object({
   description: z.string(),
 });
 
+export const skillsSchema = z.string().min(2, "skills wajib diisi");
+
 export const resumeBuilderSchema = z.object({
   personalInformation: personalInformationSchema,
   experiences: z.array(experienceSchema),
   educations: z.array(eduationSchema),
-  skills: z.string(),
+  skills: skillsSchema,
 });
 
 export type PersonalInformationSchema = z.infer<

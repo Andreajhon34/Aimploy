@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from "react";
-import { AtsResult } from "../_types/AtsResult";
+import { AtsResult } from "../_types/atsResult";
 import { AtsResultCard } from "./AtsResultCard";
 import { ChevronDownIcon, Inbox } from "lucide-react";
 import { Resume } from "@/app/_types/resume";

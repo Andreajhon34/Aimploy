@@ -5,10 +5,7 @@ import { getSession } from "../_lib/getSession";
 export default async function HomePage() {
   const session = await getSession();
   return session ? (
-    <AuthenticatedHomePage
-      userName={session.user.name}
-      userId={session.user.id}
-    />
+    <AuthenticatedHomePage userName={session.user.name} />
   ) : (
     <GuestHomePage />
   );

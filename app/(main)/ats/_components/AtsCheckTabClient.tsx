@@ -24,11 +24,13 @@ import { Sparkle, Square } from "lucide-react";
 import React from "react";
 import { ResumeCard } from "../../../_components/resumeList/ResumeCard";
 import { Resume } from "../../../_types/resume";
-import { SortType } from "../../cover-letter/_types/sortType";
+import { SortType } from "../../../_types/sortType";
 import { saveAtsResult } from "../_actions/saveAtsResult";
-import { AtsResult } from "../_types/AtsResult";
+import { AtsResult } from "../_types/atsResult";
 import { AtsScoreDisplay } from "./AtsScoreDisplay";
 import SlideTextButton from "@/components/kokonutui/slide-text-button";
+import { personalInformationSchema } from "../../resume-builder/_schemas/resumeBuilderForm";
+import { toast } from "sonner";
 
 type AtsCheckTabClient = {
   resumesPromise: Promise<Resume[]>;
@@ -78,6 +80,9 @@ export function AtsCheckTabClient({ resumesPromise }: AtsCheckTabClient) {
     },
     onSuccess: (data) => {
       setAnalysisResult(data);
+      toast.success(
+        "Resume tidak lengkap, Mohon untuk mengisi minimal bagian informasi pribadi",
+      );
       React.startTransition(async () => {
         if (!selectedResume) throw new Error("Resume not found");
         await saveAtsResult(data, selectedResume.resumeId);
@@ -90,6 +95,16 @@ export function AtsCheckTabClient({ resumesPromise }: AtsCheckTabClient) {
     if (!isValidJobDescription) throw new Error("Job description is empty");
 
     if (!selectedResume) throw new Error("Resume not found");
+
+    const zodResult = personalInformationSchema.safeParse(
+      selectedResume.content.personalInformation,
+    );
+
+    if (!zodResult.success) {
+      return toast.error(
+        "Resume tidak lengkap, Mohon untuk mengisi minimal bagian informasi pribadi",
+      );
+    }
 
     const resumeText = `
     Name: ${selectedResume.content.personalInformation.fullName ?? ""}

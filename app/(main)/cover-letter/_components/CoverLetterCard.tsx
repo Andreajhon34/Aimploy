@@ -21,7 +21,7 @@ import {
 import { Ellipsis } from "lucide-react";
 import React from "react";
 import { useReactToPrint } from "react-to-print";
-import { CoverLetter } from "../_types/CoverLetter";
+import { CoverLetter } from "../_types/coverLetter";
 import { CoverLetterPreview } from "./CoverLetterPreview";
 import {
   AlertDialog,

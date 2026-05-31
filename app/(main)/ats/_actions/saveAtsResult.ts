@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { AtsResult } from "../_types/AtsResult";
+import { AtsResult } from "../_types/atsResult";
 import { headers } from "next/headers";
 import { success } from "better-auth";
 import prisma from "@/lib/prisma";

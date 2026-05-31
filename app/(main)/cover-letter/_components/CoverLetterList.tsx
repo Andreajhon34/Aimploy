@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CoverLetterCard } from "./CoverLetterCard";
-import { CoverLetter } from "../_types/CoverLetter";
+import { CoverLetter } from "../_types/coverLetter";
 import React from "react";
 import { Resume } from "@/app/_types/resume";
 import { ChevronDownIcon, Inbox } from "lucide-react";
@@ -69,7 +69,7 @@ export function CoverLetterList({ resumesPromise }: CoverLetterListProps) {
     <div className="flex size-full flex-col justify-center gap-3 items-center">
       <Inbox className="size-10" />
       <p className="text-base font-semibold text-muted-foreground">
-        Kamu tidak memiliki hasil review saat ini
+        Kamu tidak memiliki cover letter saat ini
       </p>
     </div>
   );

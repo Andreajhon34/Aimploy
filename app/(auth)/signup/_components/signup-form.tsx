@@ -70,25 +70,25 @@ export function SignupForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-xl font-bold">Welcome to Aimploy.ai</h1>
-            <FieldDescription>
-              Already have an account? <Link href="/login">Log in</Link>
-            </FieldDescription>
-          </div>
-          <InputFormListProps
-            inputFields={inputFormProperties}
-            control={form.control}
-          />
-          {form.formState.errors.root && (
-            <Field>
-              <p className="text-destructive text-center">
-                {form.formState.errors.root.message}
-              </p>
-            </Field>
-          )}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-xl font-bold">Welcome to Aimploy.ai</h1>
+          <FieldDescription>
+            Already have an account? <Link href="/login">Log in</Link>
+          </FieldDescription>
+        </div>
+        <InputFormListProps
+          inputFields={inputFormProperties}
+          control={form.control}
+        />
+        {form.formState.errors.root && (
+          <p className="text-destructive text-center mt-2">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+        <FieldGroup
+          className={cn("mt-4", form.formState.errors.root && "mt-2")}
+        >
           <Field>
             <ButtonWithLoading isLoading={form.formState.isLoading}>
               Create Account

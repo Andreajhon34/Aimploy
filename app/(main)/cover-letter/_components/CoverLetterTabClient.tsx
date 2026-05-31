@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Inbox } from "lucide-react";
 import React, { Suspense } from "react";
 import { CoverLetterCard } from "./CoverLetterCard";
-import { CoverLetter } from "../_types/CoverLetter";
+import { CoverLetter } from "../_types/coverLetter";
 import { CoverLetterList, CoverLetterListProps } from "./CoverLetterList";
 import { CoverLetterListSkeleton } from "./CoverLetterListSkeleton";
 
