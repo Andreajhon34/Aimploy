@@ -6,20 +6,20 @@ import { refresh } from "next/cache";
 import { headers } from "next/headers";
 
 export const renameResume = async (resumeId: string, newTitle: string) => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    return {
-      success: false,
-      code: "UNAUTHORIZED",
-      message: "Operation is not allowed, Please log in.",
-      body: null,
-    };
-  }
-
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return {
+        success: false,
+        code: "UNAUTHORIZED",
+        message: "Operation is not allowed, Please log in.",
+        body: null,
+      };
+    }
+
     const resume = await prisma.resume.update({
       where: { userId: session.user.id, id: resumeId },
       data: { title: newTitle },

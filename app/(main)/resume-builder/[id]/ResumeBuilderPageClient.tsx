@@ -14,7 +14,11 @@ import { motion } from "framer-motion";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { saveResume } from "./_actions/saveResume";
-import { ResumeBuilderDbSchema } from "../_schemas/resumeBuilderDbForm";
+import isEqual from "lodash/isEqual";
+import {
+  resumeBuilderDbSchema,
+  ResumeBuilderDbSchema,
+} from "../_schemas/resumeBuilderDbForm";
 import {
   PersonalInformationSchema,
   resumeBuilderSchema,
@@ -48,13 +52,13 @@ const PERSONAL_INFORMATION_DEFAULTS: PersonalInformationSchema = {
   linkedinProfile: "",
 };
 
-export function ResumeBuilderForm({
+export function ResumeBuilderPageClient({
   data,
   id,
   title: initialTitle,
 }: ResumeBuilderFormProps) {
-  const form = useForm<ResumeBuilderSchema>({
-    resolver: zodResolver(resumeBuilderSchema),
+  const form = useForm({
+    resolver: zodResolver(resumeBuilderDbSchema),
     defaultValues: {
       personalInformation:
         data.personalInformation ?? PERSONAL_INFORMATION_DEFAULTS,
@@ -88,8 +92,8 @@ export function ResumeBuilderForm({
   };
 
   const handleOnBlurTitle = () => {
-    if (title === initialTitle) return;
     setIsMutatingTitle(false);
+    if (title === initialTitle) return;
     startRenameTransition(async () => {
       const res = await renameResume(id, title);
       if (res.success) {
@@ -111,11 +115,13 @@ export function ResumeBuilderForm({
   `,
   });
 
-  const onSubmit = (payload: ResumeBuilderSchema) => {
+  const onSubmit = (payload: ResumeBuilderDbSchema) => {
     if (!isValidTitle) {
       toast.error("Name must be at least 2 characters");
       return;
     }
+
+    if (isEqual(payload, data)) return;
 
     startSaveTransition(async () => {
       const res = await saveResume(id, title, payload);
@@ -146,31 +152,10 @@ export function ResumeBuilderForm({
         animate="visible"
       >
         <div className="bg-background sticky top-0 p-4 z-10 inset-x-0 border-b shadow-md flex justify-end items-center">
-          {/* <h2 className="font-semibold text-2xl">Resume builder</h2> */}
           <div className="absolute left-1/2 top-1/2 -translate-1/2 font-semibold">
             {isMutatingTitle ? (
               <Input
-                className="
-    rounded-none
-
-    border-0
-    border-b border-transparent
-
-    text-lg!
-
-    bg-transparent!
-    shadow-none
-    ring-0!
-    outline-none
-
-    p-0
-    h-auto
-    text-center
-
-    focus-visible:border-b
-    focus-visible:border-input
-    focus-visible:ring-0
-  "
+                className="text-lg! bg-transparent! shadow-none outline-none p-0 h-auto text-center"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={!isValidTitle}
@@ -182,7 +167,7 @@ export function ResumeBuilderForm({
             ) : (
               <span
                 className={cn(
-                  "text-lg px-20 cursor-text",
+                  "text-lg px-20 cursor-text truncate",
                   (isRenaming || isSaving) && "pointer-events-none opacity-50",
                 )}
                 onClick={() => setIsMutatingTitle(true)}

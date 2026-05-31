@@ -26,9 +26,9 @@ export function DropdownClient({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 bg-background/80 hover:bg-background border shadow-xs backdrop-blur-xs opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+          className="opacity-0 group-hover:opacity-100"
         >
-          <MoreVertical className="h-4 w-4" />
+          <MoreVertical />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">

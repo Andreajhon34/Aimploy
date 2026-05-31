@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { ResumeBuilderForm } from "./ResumeBuilderForm";
+import { ResumeBuilderPageClient } from "./ResumeBuilderPageClient";
 
 export default async function ResumeBuilderPage({
   params,
@@ -30,5 +30,5 @@ export default async function ResumeBuilderPage({
 
   const parsed = resumeBuilderDbSchema.parse(resume.data);
 
-  return <ResumeBuilderForm data={parsed} id={id} title={resume.title} />;
+  return <ResumeBuilderPageClient data={parsed} id={id} title={resume.title} />;
 }

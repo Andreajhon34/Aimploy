@@ -1,14 +1,15 @@
 "use client";
 
-import { fetcher } from "@/lib/fetcher";
-import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
-import { ResponseBody } from "@/types/responseBody";
+import {
+  ResumeBuilderSchema,
+  skillsSchema,
+} from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import { useFormContext } from "react-hook-form";
-import { useEnhanceMutation } from "./useEnhanceMutation";
 import { generateText } from "../_lib/generateText";
+import { useEnhanceMutation } from "./useEnhanceMutation";
 
 export const useSkillCard = () => {
-  const { control, getValues, trigger, setError } =
+  const { control, getValues, setError } =
     useFormContext<ResumeBuilderSchema>();
   const enhanceMutation = useEnhanceMutation({
     onMutation: generateText,
@@ -24,16 +25,19 @@ export const useSkillCard = () => {
   const handleOnClick = async () => {
     const rawSkills = getValues("skills");
 
-    if (!rawSkills || rawSkills.trim().length < 2) {
-      setError("skills", {
-        type: "manual",
-        message: "Keahlian wajib diisi",
+    const zodResult = skillsSchema.safeParse(rawSkills);
+
+    if (!zodResult.success) {
+      zodResult.error.issues.forEach((issue) => {
+        const subFieldName = issue.path.join(".");
+        setError(`skills`, {
+          type: "aiValidation",
+          message: issue.message,
+        });
       });
+
       return;
     }
-
-    const isValid = await trigger("skills");
-    if (!isValid) return;
 
     const prompt = `
 Rapikan dan kelompokkan daftar keahlian berikut untuk bagian Skills di resume.

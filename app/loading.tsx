@@ -1,9 +1,12 @@
 import { Loader2 } from "lucide-react";
 
 export default function Loading() {
+  {
+    /* Comment out loading screen untuk experience yang lebih smooth */
+  }
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background">
-      <Loader2 className="size-10 animate-spin" />
+      {/* <Loader2 className="size-10 animate-spin" /> */}
     </div>
   );
 }

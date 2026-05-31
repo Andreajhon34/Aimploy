@@ -3,10 +3,15 @@
 import { useEnhanceMutation } from "./useEnhanceMutation";
 import { generateText } from "../_lib/generateText";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
+import {
+  ExperienceSchema,
+  experienceSchema,
+  ResumeBuilderSchema,
+} from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 
 export const useExperienceCard = () => {
-  const { control, getValues, trigger } = useFormContext<ResumeBuilderSchema>();
+  const { control, getValues, setError } =
+    useFormContext<ResumeBuilderSchema>();
   const { fields, remove, append } = useFieldArray({
     control,
     name: "experiences",
@@ -24,19 +29,32 @@ export const useExperienceCard = () => {
   });
 
   const handleOnClick = async (index: number) => {
-    const isValid = await trigger([
-      `experiences.${index}.company`,
-      `experiences.${index}.endDate`,
-      `experiences.${index}.position`,
-      `experiences.${index}.startDate`,
-      `experiences.${index}.jobDescription`,
-    ]);
-
-    if (!isValid) return;
-
     const { company, endDate, position, startDate, jobDescription } = getValues(
       `experiences.${index}`,
     );
+
+    const zodResult = experienceSchema.safeParse({
+      company,
+      endDate,
+      position,
+      startDate,
+      jobDescription,
+    });
+
+    if (!zodResult.success) {
+      zodResult.error.issues.forEach((issue) => {
+        const subFieldName = issue.path.join(".");
+        setError(
+          `experiences.${index}.${subFieldName as keyof ExperienceSchema}`,
+          {
+            type: "aiValidation",
+            message: issue.message,
+          },
+        );
+      });
+
+      return;
+    }
 
     const prompt = `
 Buat deskripsi pekerjaan untuk resume dalam format HTML bullet point.

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -69,40 +70,36 @@ export function RenameDropdownItem({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nama baru</DialogTitle>
+            <DialogTitle>Ubah Nama</DialogTitle>
           </DialogHeader>
+          <Input
+            aria-invalid={!isValidTitle}
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleRename();
+              if (e.key === "Escape") setDropdownOpen(false);
+            }}
+          />
+          {!isValidTitle && (
+            <p className="text-destructive mt-2">
+              Nama harus lebih dari 2 karakter
+            </p>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
 
-          <div className="flex flex-col">
-            <Input
-              aria-invalid={!isValidTitle}
-              autoFocus
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleRename();
-                if (e.key === "Escape") setDropdownOpen(false);
-              }}
-            />
-            {!isValidTitle && (
-              <p className="text-destructive mt-2">
-                Nama harus lebih dari 2 karakter
-              </p>
-            )}
-
-            <div className="flex gap-2 justify-end mt-4">
-              <Button
-                variant="ghost"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-
-              <Button onClick={handleRename} disabled={isPending}>
-                Save
-              </Button>
-            </div>
-          </div>
+            <Button onClick={handleRename} disabled={isPending}>
+              Save
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

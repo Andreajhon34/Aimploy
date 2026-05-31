@@ -6,6 +6,7 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
@@ -53,15 +54,17 @@ export const LogoutDialog = ({ email, ...props }: LogoutDialogProps) => {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Apakah kamu yakin ingin Log out?</AlertDialogTitle>
+          <AlertDialogTitle>Apakah anda yakin ingin keluar?</AlertDialogTitle>
           <AlertDialogDescription>
-            Log Out sebagai {email} ?
+            keluar sebagai {email} ?
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogCancel className="mt-5">Batalkan</AlertDialogCancel>
-        <AlertDialogAction onClick={handleLogout} variant="destructive">
-          Log Out
-        </AlertDialogAction>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Batalkan</AlertDialogCancel>
+          <AlertDialogAction onClick={handleLogout} variant="destructive">
+            Keluar
+          </AlertDialogAction>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
