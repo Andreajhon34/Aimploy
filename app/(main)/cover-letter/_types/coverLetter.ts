@@ -6,4 +6,5 @@ export type CoverLetter = {
     email: string;
     phone: string;
   };
+  createdAt: Date;
 };
