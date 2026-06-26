@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/card";
 import { EnhanceWithAiButton } from "@/components/ui/EnhanceWithAiButton";
 import type { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
-import { Briefcase, Plus, Trash } from "lucide-react";
+import { Briefcase, Plus, Sparkle, Square, Trash } from "lucide-react";
 import { ExperienceSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
+import { ExperienceDbSchema } from "../../_schemas/resumeBuilderDbForm";
+import SlideTextButton from "@/components/kokonutui/slide-text-button";
 
-const EXPERIENCE_DEFAULTS: ExperienceSchema = {
+const EXPERIENCE_DEFAULTS: ExperienceDbSchema = {
   id: crypto.randomUUID(),
   company: "",
-  endDate: "Sekarang",
+  endDate: `${new Date().toLocaleString("default", { month: "short" })} ${new Date().getFullYear()}`,
   position: "",
   startDate: "",
   jobDescription: "",
@@ -36,6 +38,7 @@ const ExperienceCard = () => {
     remove,
     append,
     tiptapRef,
+    handleOnCancle,
   } = useExperienceCard();
 
   const inputProperties: InputProperties<
@@ -80,7 +83,7 @@ const ExperienceCard = () => {
           Pengalaman kerja
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-3">
         {fields.map((_, index) => (
           <Card>
             <CardHeader>
@@ -116,12 +119,31 @@ const ExperienceCard = () => {
                     />
                   ),
               )}
-              <EnhanceWithAiButton
-                isLoading={isPending}
-                isSuccess={isSuccess}
-                disabled={isPending}
-                onClick={() => handleOnClick(index)}
-              />
+              <div className="col-span-2">
+                {!isPending ? (
+                  <SlideTextButton
+                    type="button"
+                    className="w-full text-center"
+                    onClick={() => handleOnClick(index)}
+                    text={<Sparkle />}
+                    hoverText={
+                      <>
+                        Generate with <span className="font-bold">Aimploy</span>
+                      </>
+                    }
+                    disabled={isPending}
+                  />
+                ) : (
+                  <Button
+                    className="w-full"
+                    onClick={handleOnCancle}
+                    type="button"
+                  >
+                    <Square />
+                    <span className="sr-only">pause</span>
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}

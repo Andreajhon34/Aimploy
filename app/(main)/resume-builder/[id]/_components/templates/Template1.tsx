@@ -5,6 +5,7 @@ import { Mail, Phone } from "lucide-react";
 import React from "react";
 import { UseFormWatch } from "react-hook-form";
 import { FaLinkedin } from "react-icons/fa";
+import { ResumeBuilderDbSchema } from "../../../_schemas/resumeBuilderDbForm";
 
 const SectionTitle = ({ title }: { title: string }) => (
   <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase mt-6 mb-2">
@@ -13,7 +14,7 @@ const SectionTitle = ({ title }: { title: string }) => (
 );
 
 type Template1Props = React.ComponentProps<"div"> & {
-  watch: UseFormWatch<ResumeBuilderSchema>;
+  watch: UseFormWatch<ResumeBuilderDbSchema>;
 };
 
 {

@@ -6,13 +6,16 @@ import {
 } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
-import { resumeBuilderDbSchema } from "../../_schemas/resumeBuilderDbForm";
+import {
+  ResumeBuilderDbSchema,
+  resumeBuilderDbSchema,
+} from "../../_schemas/resumeBuilderDbForm";
 import { refresh } from "next/cache";
 
 export const saveResume = async (
   resumeId: string,
   title: string,
-  data: ResumeBuilderSchema,
+  data: ResumeBuilderDbSchema,
 ) => {
   try {
     const session = await auth.api.getSession({

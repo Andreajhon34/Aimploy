@@ -17,12 +17,14 @@ import type {
   EducationSchema,
   ResumeBuilderSchema,
 } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
-import { GraduationCap, Plus, Trash } from "lucide-react";
+import { GraduationCap, Plus, Sparkle, Square, Trash } from "lucide-react";
+import SlideTextButton from "@/components/kokonutui/slide-text-button";
+import { EducationDbSchema } from "../../_schemas/resumeBuilderDbForm";
 
-export const EDUCATION_DEFAULT: EducationSchema = {
+export const EDUCATION_DEFAULT: EducationDbSchema = {
   id: crypto.randomUUID(),
   degree: "",
-  endYear: "Sekarang",
+  endYear: new Date().getFullYear().toString(),
   institute: "",
   startYear: "",
   description: "",
@@ -38,6 +40,7 @@ const EducationCard = () => {
     remove,
     append,
     tiptapRef,
+    handleOnCancle,
   } = useEducationCard();
 
   const inputProperties: InputProperties<
@@ -56,16 +59,16 @@ const EducationCard = () => {
       placeholder: "Teknik Informatika",
     },
     {
-      label: "Tanggal Mulai",
+      label: "Tahun Mulai",
       name: "startYear",
       className: "col-span-1",
-      placeholder: "Sept 2019",
+      placeholder: "2019",
     },
     {
-      label: "Tanggal Selesai",
+      label: "Tahun Selesai",
       name: "endYear",
       className: "col-span-1",
-      placeholder: "May 2023",
+      placeholder: "2023",
     },
     {
       label: "Deskripsi / Catatan Tambahan",
@@ -84,9 +87,9 @@ const EducationCard = () => {
           Pendidikan
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-3">
         {fields.map((_, index) => (
-          <Card>
+          <Card key={index}>
             <CardHeader>
               <CardAction>
                 <Button
@@ -103,6 +106,7 @@ const EducationCard = () => {
                 ({ className, label, name, placeholder }, fieldIndex) =>
                   fieldIndex !== inputProperties.length - 1 ? (
                     <InputField
+                      key={name}
                       label={label}
                       className={className}
                       name={`educations.${index}.${name}`}
@@ -111,6 +115,7 @@ const EducationCard = () => {
                     />
                   ) : (
                     <EditorField
+                      key={name}
                       ref={tiptapRef}
                       label={label}
                       className={className}
@@ -120,12 +125,31 @@ const EducationCard = () => {
                     />
                   ),
               )}
-              <EnhanceWithAiButton
-                isLoading={isPending}
-                isSuccess={isSuccess}
-                disabled={isPending}
-                onClick={() => handleOnClick(index)}
-              />
+              <div className="col-span-2">
+                {!isPending ? (
+                  <SlideTextButton
+                    type="button"
+                    className="w-full text-center"
+                    onClick={() => handleOnClick(index)}
+                    text={<Sparkle />}
+                    hoverText={
+                      <>
+                        Generate with <span className="font-bold">Aimploy</span>
+                      </>
+                    }
+                    disabled={isPending}
+                  />
+                ) : (
+                  <Button
+                    className="w-full"
+                    onClick={handleOnCancle}
+                    type="button"
+                  >
+                    <Square />
+                    <span className="sr-only">pause</span>
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}

@@ -9,14 +9,14 @@ export type ResumeCardProps = { resume: Omit<Resume, "content" | "createdAt"> };
 
 export function ResumeCard({ resume }: ResumeCardProps) {
   return (
-    <MagicCard className="group w-full aspect-square relative rounded-md overflow-auto">
+    <MagicCard className="group isolate w-full aspect-square relative rounded-md overflow-auto">
       <div className="absolute top-3 right-3 z-20">
         <DropdownClient resumeId={resume.resumeId} title={resume.title} />
       </div>
 
       <Link
         href={`/resume-builder/${resume.resumeId}`}
-        className="size-full flex flex-col relative focus:outline-none h-70"
+        className="size-full flex z-10 flex-col relative focus:outline-none h-70"
       >
         <div className="flex-1 overflow-y-hidden">
           <Template1Preview className="blur-[3px]" />

@@ -1,24 +1,68 @@
 "use client";
 
-import { useEnhanceMutation } from "./useEnhanceMutation";
-import { generateText } from "../_lib/generateText";
+import { useResumeMutationBase } from "./useResumeMutationBase";
+import generateContent from "../_lib/generateContent";
 import {
-  eduationSchema,
+  educationSchema,
   EducationSchema,
 } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { ResumeBuilderSchema } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
+import { fetcher } from "@/lib/fetcher";
+import { ResponseBody } from "@/types/responseBody";
+import React from "react";
+import { ResumeBuilderDbSchema } from "../../_schemas/resumeBuilderDbForm";
+
+const getEducationPrompt = ({
+  degree,
+  description,
+  endYear,
+  institute,
+  startYear,
+}: EducationSchema) => {
+  return `
+Buat 1-2 kalimat deskripsi pendidikan untuk resume.
+
+Data:
+- Institusi: ${institute}
+- Gelar/Jurusan: ${degree}
+- Tahun: ${startYear} - ${endYear}
+- Deskripsi awal dari kandidat: "${description}"
+
+Instruksi:
+1. Cek "Deskripsi awal dari kandidat":
+   - Jika "[KOSONG]", BUAT 1-2 kalimat baru dari nol berdasarkan data di atas.
+   - Jika ada isi, PERBAGUS dan PERAPIH kalimatnya. JANGAN mengarang prestasi, IPK, atau proyek baru. Cukup perbaiki struktur, tata bahasa, dan pakai kata yang lebih profesional.
+
+2. Aturan output:
+   - Sesuaikan bahasa dengan bahasa yang ditulis kandidat
+   - Tulis dari sudut pandang orang pertama, pakai "Saya". Jangan orang ketiga.
+   - Fokus ke hal relevan: prestasi, IPK >=3.5, mata kuliah utama, proyek akhir, organisasi, skill.
+   - Gaya profesional, langsung ke poin. Tanpa pembuka "Saya adalah".
+   - Output HANYA HTML: pakai tag <p> dan <strong> saja. Jangan pakai <html>, <body>, <div>, markdown, class.
+   - Maksimal 2 kalimat, total <200 karakter.
+   - Jangan mengarang data yang tidak ada di input. Kalau data kosong, lewati.
+
+Contoh input kosong:
+Output: <p>Lulus <strong>S1 Teknik Informatika</strong>. Fokus pada pengembangan web dan basis data.</p>
+
+Contoh input ada isi "kuliah di ui, ipk 3.8, skripsi ai":
+Output: <p>Lulus <strong>S1 Ilmu Komputer</strong> dengan IPK 3.8. Skripsi tentang implementasi AI untuk klasifikasi gambar.</p>
+`;
+};
 
 export const useEducationCard = () => {
   const { control, getValues, setError } =
-    useFormContext<ResumeBuilderSchema>();
+    useFormContext<ResumeBuilderDbSchema>();
   const { fields, remove, append } = useFieldArray({
     control,
     name: "educations",
   });
 
-  const { mutate, ...props } = useEnhanceMutation({
-    onMutation: generateText,
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  const { mutate, ...props } = useResumeMutationBase({
+    mutationFn: generateContent,
     onSuccess: (outputText) => {
       props.tiptapRef.current?.editor
         ?.chain()
@@ -26,19 +70,20 @@ export const useEducationCard = () => {
         .setContent(outputText)
         .run();
     },
+    onSettled: () => (abortControllerRef.current = null),
   });
 
   const handleOnClick = async (index: number) => {
-    const { degree, endYear, institute, startYear, description } = getValues(
-      `educations.${index}`,
-    );
+    const { degree, endYear, institute, startYear, description, id } =
+      getValues(`educations.${index}`);
 
-    const zodResult = eduationSchema.safeParse({
+    const zodResult = educationSchema.safeParse({
       degree,
       endYear,
       institute,
       startYear,
       description,
+      id,
     });
 
     if (!zodResult.success) {
@@ -56,36 +101,17 @@ export const useEducationCard = () => {
       return;
     }
 
-    const prompt = `
-Buat 1-2 kalimat deskripsi pendidikan untuk resume.
-
-Data:
-- Institusi: ${institute}
-- Gelar/Jurusan: ${degree}
-- Tahun: ${startYear} - ${endYear || "Sekarang"}
-- Deskripsi awal dari kandidat: "${description || "[KOSONG]"}"
-
-Instruksi:
-1. Cek "Deskripsi awal dari kandidat":
-   - Jika "[KOSONG]", BUAT 1-2 kalimat baru dari nol berdasarkan data di atas.
-   - Jika ada isi, PERBAGUS dan PERAPIH kalimatnya. JANGAN mengarang prestasi, IPK, atau proyek baru. Cukup perbaiki struktur, tata bahasa, dan pakai kata yang lebih profesional.
-
-2. Aturan output:
-   - Tulis dari sudut pandang orang pertama, pakai "Saya". Jangan orang ketiga.
-   - Fokus ke hal relevan: prestasi, IPK >=3.5, mata kuliah utama, proyek akhir, organisasi, skill.
-   - Gaya profesional, langsung ke poin. Tanpa pembuka "Saya adalah".
-   - Output HANYA HTML: pakai tag <p> dan <strong> saja. Jangan pakai <html>, <body>, <div>, markdown, class.
-   - Maksimal 2 kalimat, total <200 karakter.
-   - Jangan mengarang data yang tidak ada di input. Kalau data kosong, lewati.
-
-Contoh input kosong:
-Output: <p>Lulus <strong>S1 Teknik Informatika</strong>. Fokus pada pengembangan web dan basis data.</p>
-
-Contoh input ada isi "kuliah di ui, ipk 3.8, skripsi ai":
-Output: <p>Lulus <strong>S1 Ilmu Komputer</strong> dengan IPK 3.8. Skripsi tentang implementasi AI untuk klasifikasi gambar.</p>
-`;
-    mutate(prompt);
+    mutate({
+      text: getEducationPrompt(zodResult.data),
+    });
   };
 
-  return { control, fields, handleOnClick, remove, append, ...props };
+  return {
+    control,
+    fields,
+    handleOnClick,
+    remove,
+    append,
+    ...props,
+  };
 };

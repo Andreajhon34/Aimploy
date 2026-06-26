@@ -1,69 +1,32 @@
 "use client";
 
-import { useEnhanceMutation } from "./useEnhanceMutation";
-import { generateText } from "../_lib/generateText";
+import { useResumeMutationBase } from "./useResumeMutationBase";
+import generateContent from "../_lib/generateContent";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import {
   ExperienceSchema,
   experienceSchema,
+  resumeBuilderSchema,
   ResumeBuilderSchema,
 } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
+import { ResumeBuilderDbSchema } from "../../_schemas/resumeBuilderDbForm";
 
-export const useExperienceCard = () => {
-  const { control, getValues, setError } =
-    useFormContext<ResumeBuilderSchema>();
-  const { fields, remove, append } = useFieldArray({
-    control,
-    name: "experiences",
-  });
-
-  const { mutate, ...props } = useEnhanceMutation({
-    onMutation: generateText,
-    onSuccess: (outputText) => {
-      props.tiptapRef.current?.editor
-        ?.chain()
-        .focus()
-        .setContent(outputText)
-        .run();
-    },
-  });
-
-  const handleOnClick = async (index: number) => {
-    const { company, endDate, position, startDate, jobDescription } = getValues(
-      `experiences.${index}`,
-    );
-
-    const zodResult = experienceSchema.safeParse({
-      company,
-      endDate,
-      position,
-      startDate,
-      jobDescription,
-    });
-
-    if (!zodResult.success) {
-      zodResult.error.issues.forEach((issue) => {
-        const subFieldName = issue.path.join(".");
-        setError(
-          `experiences.${index}.${subFieldName as keyof ExperienceSchema}`,
-          {
-            type: "aiValidation",
-            message: issue.message,
-          },
-        );
-      });
-
-      return;
-    }
-
-    const prompt = `
+const getExperiencePrompt = ({
+  company,
+  endDate,
+  id,
+  jobDescription,
+  position,
+  startDate,
+}: ExperienceSchema) => {
+  return `
 Buat deskripsi pekerjaan untuk resume dalam format HTML bullet point.
 
 Data:
 - Perusahaan: ${company}
 - Posisi: ${position}
-- Periode: ${startDate} - ${endDate || "Sekarang"}
-- Deskripsi awal dari kandidat: "${jobDescription || "[KOSONG]"}"
+- Periode: ${startDate} - ${endDate}
+- Deskripsi awal dari kandidat: "${jobDescription}"
 
 Instruksi:
 1. Periksa "Deskripsi awal dari kandidat".
@@ -86,8 +49,57 @@ Output: <ul><li>Mengembangkan aplikasi web menggunakan React dan TypeScript</li>
 Contoh input ada isi "bikin website, meeting klien":
 Output: <ul><li>Mengembangkan dan memelihara website perusahaan untuk meningkatkan pengalaman pengguna</li><li>Berkomunikasi dengan klien untuk memahami kebutuhan dan memastikan deliverable sesuai target</li></ul>
 `;
+};
 
-    mutate(prompt);
+export const useExperienceCard = () => {
+  const { control, getValues, setError } =
+    useFormContext<ResumeBuilderDbSchema>();
+  const { fields, remove, append } = useFieldArray({
+    control,
+    name: "experiences",
+  });
+
+  const { mutate, ...props } = useResumeMutationBase({
+    mutationFn: generateContent,
+    onSuccess: (outputText) => {
+      props.tiptapRef.current?.editor
+        ?.chain()
+        .focus()
+        .setContent(outputText)
+        .run();
+    },
+  });
+
+  const handleOnClick = async (index: number) => {
+    const { company, endDate, position, startDate, jobDescription, id } =
+      getValues(`experiences.${index}`);
+
+    const zodResult = experienceSchema.safeParse({
+      company,
+      endDate,
+      position,
+      startDate,
+      jobDescription,
+      id,
+    });
+
+    if (!zodResult.success) {
+      zodResult.error.issues.forEach((issue) => {
+        const subFieldName = issue.path.join(".");
+
+        setError(
+          `experiences.${index}.${subFieldName as keyof ExperienceSchema}`,
+          {
+            type: "aiValidation",
+            message: issue.message,
+          },
+        );
+      });
+
+      return;
+    }
+
+    mutate({ text: getExperiencePrompt(zodResult.data) });
   };
 
   return { control, fields, handleOnClick, remove, append, ...props };

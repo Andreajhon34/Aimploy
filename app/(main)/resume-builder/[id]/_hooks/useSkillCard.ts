@@ -5,14 +5,14 @@ import {
   skillsSchema,
 } from "@/app/(main)/resume-builder/_schemas/resumeBuilderForm";
 import { useFormContext } from "react-hook-form";
-import { generateText } from "../_lib/generateText";
-import { useEnhanceMutation } from "./useEnhanceMutation";
+import generateContent from "../_lib/generateContent";
+import { useResumeMutationBase } from "./useResumeMutationBase";
 
 export const useSkillCard = () => {
   const { control, getValues, setError } =
     useFormContext<ResumeBuilderSchema>();
-  const enhanceMutation = useEnhanceMutation({
-    onMutation: generateText,
+  const enhanceMutation = useResumeMutationBase({
+    mutationFn: generateContent,
     onSuccess: (outputText) => {
       enhanceMutation.tiptapRef.current?.editor
         ?.chain()
@@ -66,7 +66,7 @@ Contoh output:
 <p><strong>Soft Skill:</strong> Komunikasi</p>
 `;
 
-    enhanceMutation.mutate(prompt);
+    enhanceMutation.mutate({ text: prompt });
   };
 
   return { control, handleOnClick, ...enhanceMutation };

@@ -48,27 +48,22 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
   const [coverLetterContent, setCoverLetterContent] = React.useState<
     string | null
   >(null);
-  const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
+  // const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
   const mutation = useMutation({
     mutationFn: async (prompt: string) => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
-
-      const timeoutId = setTimeout(() => controller.abort("timeout"), 60_000);
-      timeoutIdRef.current = timeoutId;
-
-      try {
-        const { data } = await fetcher<ResponseBody<string>>("/api/generate", {
-          method: "POST",
+      const { data } = await fetcher.post<ResponseBody<string>>(
+        "/api/generate",
+        {
           body: JSON.stringify({ prompt }),
           signal: controller.signal,
-        });
-        return data;
-      } finally {
-        clearTimeout(timeoutId);
-      }
+          timeout: 300000,
+        },
+      );
+      return data;
     },
     onSuccess: (data) => {
       setCoverLetterContent(data);
@@ -78,7 +73,19 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
         await saveCoverLetter(data, selectedResume.resumeId);
       });
     },
-    onError: (err: unknown) => toastApiError(err, abortControllerRef),
+    onError: (err, variables, onMutateResult, context) => {
+      if (err instanceof HttpError) {
+        if (err.code === "REQUEST_ABORTED") return;
+
+        return toast.error("Error", {
+          description: err.message,
+        });
+      }
+
+      toast.error(
+        "Terjadi kesalahan, Silahkan periksa koneksi internet anda dan coba lagi nanti",
+      );
+    },
   });
 
   const handleGenerate = async () => {
@@ -156,13 +163,8 @@ export function CreateTabClient({ resumesPromise }: CreateTableClient) {
 
   const handleCancelGenerate = () => {
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort("user");
+      abortControllerRef.current.abort();
       abortControllerRef.current = null;
-
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = null;
-      }
 
       mutation.reset();
     }

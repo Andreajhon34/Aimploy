@@ -27,7 +27,7 @@ export function TemplateDialog({ setTemplate }: TemplateDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="me-3">
+        <Button size="lg" className="me-3" variant="ghost">
           Templates
         </Button>
       </DialogTrigger>

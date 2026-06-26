@@ -31,6 +31,7 @@ import { AtsScoreDisplay } from "./AtsScoreDisplay";
 import SlideTextButton from "@/components/kokonutui/slide-text-button";
 import { personalInformationSchema } from "../../resume-builder/_schemas/resumeBuilderForm";
 import { toast } from "sonner";
+import { HttpError } from "@/lib/HttpError";
 
 type AtsCheckTabClient = {
   resumesPromise: Promise<Resume[]>;
@@ -52,7 +53,6 @@ export function AtsCheckTabClient({ resumesPromise }: AtsCheckTabClient) {
   const isButtonActive = hasResumeSelected && isValidJobDescription;
 
   const abortControllerRef = React.useRef<AbortController | null>(null);
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const [sortBy, setSortBy] = React.useState<SortType>("latest");
 
@@ -61,22 +61,18 @@ export function AtsCheckTabClient({ resumesPromise }: AtsCheckTabClient) {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      const timeoutId = setTimeout(() => controller.abort("timeout"), 60_000);
-      timeoutRef.current = timeoutId;
-
-      try {
-        const { data } = await fetcher<ResponseBody<string>>("/api/generate", {
+      const { data } = await fetcher.post<ResponseBody<string>>(
+        "/api/generate",
+        {
           method: "POST",
           body: JSON.stringify({ prompt }),
           signal: controller.signal,
-        });
+        },
+      );
 
-        const jsonData = JSON.parse(data);
+      const jsonData = JSON.parse(data);
 
-        return jsonData as AtsResult;
-      } finally {
-        clearTimeout(timeoutId);
-      }
+      return jsonData as AtsResult;
     },
     onSuccess: (data) => {
       setAnalysisResult(data);
@@ -88,7 +84,19 @@ export function AtsCheckTabClient({ resumesPromise }: AtsCheckTabClient) {
         await saveAtsResult(data, selectedResume.resumeId);
       });
     },
-    onError: (err: unknown) => toastApiError(err),
+    onError: (err, variables, onMutateResult, context) => {
+      if (err instanceof HttpError) {
+        if (err.code === "REQUEST_ABORTED") return;
+
+        return toast.error("Error", {
+          description: err.message,
+        });
+      }
+
+      toast.error(
+        "Terjadi kesalahan, Silahkan periksa koneksi internet anda dan coba lagi nanti",
+      );
+    },
   });
 
   const handleCheckAtsScore = () => {
@@ -178,11 +186,6 @@ export function AtsCheckTabClient({ resumesPromise }: AtsCheckTabClient) {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort("user");
       abortControllerRef.current = null;
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
 
       mutation.reset();
     }

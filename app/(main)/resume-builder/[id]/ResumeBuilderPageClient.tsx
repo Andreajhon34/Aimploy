@@ -177,7 +177,12 @@ export function ResumeBuilderPageClient({
             )}
           </div>
           <TemplateDialog setTemplate={setTemplate} />
-          <Button size="icon-lg" type="submit" disabled={isSaving}>
+          <Button
+            size="icon-lg"
+            type="submit"
+            disabled={isSaving}
+            variant="ghost"
+          >
             <Save />
             <span className="sr-only">save resume</span>
           </Button>

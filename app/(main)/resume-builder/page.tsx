@@ -6,12 +6,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ResumeGrid, ResumesGridProps } from "./_components/ResumesGrid";
 import { ResumeCounter } from "./_components/ResumeCounter";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 function ResumeBuilderContent({ userId }: { userId: string }) {
   const resumesPromise = prisma.resume
@@ -35,15 +36,15 @@ function ResumeBuilderContent({ userId }: { userId: string }) {
       <div className="flex-1 flex flex-col container mx-auto px-4 py-16">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              asChild
-              className="h-56 w-full border-2 border-dashed"
+            <Link
+              href="/resume-builder/new"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "default" }),
+                "h-56 w-full border-2 border-dashed",
+              )}
             >
-              <Link href="/resume-builder/new">
-                <Plus className="size-20 text-muted-foreground" />
-              </Link>
-            </Button>
+              <Plus className="size-20 text-muted-foreground" />
+            </Link>
           </TooltipTrigger>
           <TooltipContent side="bottom">
             <p>Buat resume baru</p>

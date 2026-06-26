@@ -1,65 +1,87 @@
 import { NextResponse } from "next/server";
 import { ai } from "@/lib/gemini";
 import { ApiError } from "@google/genai";
+import { z } from "zod";
+
+const requestBodySchema = z.object({
+  prompt: z.string(),
+});
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const prompt = JSON.stringify(body);
+    const zodResult = requestBodySchema.safeParse(body);
+
+    if (!zodResult.success) {
+      return NextResponse.json({
+        success: false,
+        code: "VALIDATION_ERROR",
+        message: "The providate data was invalid",
+        error: zodResult.error.flatten(),
+      });
+    }
+
+    const { prompt } = zodResult.data;
 
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
+      config: { abortSignal: req.signal },
     });
 
     return NextResponse.json(
       {
         success: true,
         code: "SUCCESS",
-        message: "Prompt was successfull",
+        message: "Content generated successfully.",
         data: response.text,
       },
       { status: 200 },
     );
   } catch (err) {
     if (err instanceof ApiError) {
-      const allowedStatus = [429, 500, 503, 504];
       try {
-        const error = JSON.parse(err.message)["error"];
+        const parsedError = JSON.parse(err.message);
+        const { status, message, code } = parsedError["error"];
+        const allowedStatus: readonly number[] = [429, 404];
 
         if (allowedStatus.includes(err.status)) {
           return NextResponse.json(
             {
               success: false,
-              code: error["status"],
-              message: error["message"],
-              data: null,
+              code: status,
+              message: message,
+              error: null,
             },
-            { status: 500 },
+            { status: code },
           );
         }
-      } catch (err) {
-        console.error("Unexpected Error:", err);
-        return NextResponse.json(
-          {
-            success: false,
-            code: "Internal server error",
-            message: "internal server error, please try again later",
-            data: null,
-          },
-          { status: 500 },
+      } catch {
+        console.warn(
+          "[Route Handler POST /generate] ApiError.message no longer returns a parsable JSON object:",
+          err,
         );
       }
+    } else if (err instanceof DOMException && err.name === "AbortError") {
+      return NextResponse.json(
+        {
+          success: false,
+          code: "REQUEST_ABORTED",
+          message: "Request was aborted by the client.",
+          error: null,
+        },
+        { status: 499 },
+      );
     }
 
-    console.error("Unexpected Error:", err);
+    console.error("[Route Handler POST /generate]:", err);
     return NextResponse.json(
       {
         success: false,
-        code: "Internal server error",
+        code: "INTERNAL_SERVER_ERROR",
         message: "internal server error, please try again later",
-        data: null,
+        error: null,
       },
       { status: 500 },
     );
