@@ -79,7 +79,7 @@ export function AuthenticatedHomePage({
               >
                 <MagicCard
                   mode="orb"
-                  className="flex rounded-xl flex-col h-full text-center justify-center items-center relative"
+                  className="flex rounded-xl flex-col size-full text-center justify-center items-center relative"
                 >
                   <motion.h2
                     variants={{
@@ -94,16 +94,18 @@ export function AuthenticatedHomePage({
                     </div>
                   </motion.h2>
 
-                  <motion.p
-                    variants={{
-                      rest: { opacity: 0, y: 10 },
-                      hover: { opacity: 1, y: 0 },
-                    }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-base font-semibold px-6 leading-relaxed"
-                  >
-                    {hoverText}
-                  </motion.p>
+                  <div className="size-full flex justify-center items-center">
+                    <motion.p
+                      variants={{
+                        rest: { opacity: 0, y: 10 },
+                        hover: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                      className="text-base font-semibold px-6 leading-relaxed"
+                    >
+                      {hoverText}
+                    </motion.p>
+                  </div>
                 </MagicCard>
               </motion.div>
             </Link>
