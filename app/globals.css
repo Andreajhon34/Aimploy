@@ -15,6 +15,24 @@
   }
 }
 
+@utility container {
+  @variant sm {
+    max-width: 96rem;
+  }
+  @variant md {
+    max-width: 96rem;
+  }
+  @variant lg {
+    max-width: 96rem;
+  }
+  @variant xl {
+    max-width: 96rem;
+  }
+  @variant 2xl {
+    max-width: 96rem;
+  }
+}
+
 .resume-conf {
   background-color: white;
   color: black;

@@ -116,7 +116,7 @@ export default async function CoverLetterPage() {
     );
 
   return (
-    <div className="flex-1 container mx-auto p-4 pt-20! flex flex-col gap-20">
+    <div className="flex-1 container mx-auto p-4 px-18 pt-20! flex flex-col gap-20 min-w-[80rem]">
       <Tabs defaultValue="create" className="h-[640px] w-full">
         <TabsList>
           <TabsTrigger value="create">Buat</TabsTrigger>

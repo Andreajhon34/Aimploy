@@ -113,7 +113,7 @@ export default async function AtsPage() {
     );
 
   return (
-    <div className="w-full flex-1 container mx-auto flex px-4 pb-4 pt-20! flex-col gap-20">
+    <div className="w-full flex-1 container mx-auto flex px-18 pb-4 pt-20! flex-col gap-20 min-w-[80rem]">
       <Tabs defaultValue="review" className="w-full h-[640px]">
         <TabsList>
           <TabsTrigger value="review">Review</TabsTrigger>

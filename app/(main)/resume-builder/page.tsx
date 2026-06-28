@@ -33,7 +33,7 @@ function ResumeBuilderContent({ userId }: { userId: string }) {
 
   return (
     <div className="min-h-screen w-full bg-background flex flex-col">
-      <div className="flex-1 flex flex-col container mx-auto px-4 py-16">
+      <div className="flex-1 flex flex-col container mx-auto px-18 py-16 min-w-[80rem]">
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
