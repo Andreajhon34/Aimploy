@@ -18,9 +18,10 @@ const SkillCard = () => {
   } = useSkillCard();
 
   return (
-    <div className="flex flex-col px-2.5 mt-3 gap-2">
+    <div className="grid grid-cols-1 gap-3">
       <EditorField
         ref={tiptapRef}
+        className="col-span-1"
         name="skills"
         label="Tuliskan keahlian kamu di sini"
         control={control}
@@ -29,7 +30,7 @@ const SkillCard = () => {
       {!isPending ? (
         <SlideTextButton
           type="button"
-          className="w-full text-center"
+          className="col-span-1 w-full"
           onClick={() => handleOnClick()}
           text={<Sparkle />}
           hoverText={

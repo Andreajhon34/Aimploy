@@ -57,7 +57,7 @@ export function AuthenticatedHomePage({
 
   return (
     <div className="min-h-screen w-full bg-background flex flex-col">
-      <div className="flex-1 flex flex-col pt-[400px] container mx-auto px-4 py-16 space-y-12">
+      <div className="flex-1 flex flex-col pt-[400px] px-18 container mx-auto min-w-[80rem] py-16 space-y-12">
         <div className="flex flex-col items-center text-center gap-3">
           <h1 className="text-5xl font-extrabold tracking-tight">
             Halo, <AuroraText>{userName}</AuroraText>

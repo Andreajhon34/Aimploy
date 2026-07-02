@@ -85,7 +85,7 @@ const ExperienceCard = () => {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {fields.map((_, index) => (
-          <Card>
+          <Card key={_.id}>
             <CardHeader>
               <CardAction>
                 <Button
@@ -102,6 +102,7 @@ const ExperienceCard = () => {
                 ({ className, label, name, placeholder }, fieldIndex) =>
                   fieldIndex !== inputProperties.length - 1 ? (
                     <InputField
+                      key={name}
                       label={label}
                       className={className}
                       name={`experiences.${index}.${name}`}
@@ -110,6 +111,7 @@ const ExperienceCard = () => {
                     />
                   ) : (
                     <EditorField
+                      key={name}
                       ref={tiptapRef}
                       label={label}
                       className={className}

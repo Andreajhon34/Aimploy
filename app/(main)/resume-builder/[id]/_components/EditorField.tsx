@@ -10,7 +10,7 @@ type EditorFieldProps<T extends FieldValues> = {
   placeholder?: string;
 } & Omit<ControllerProps<T>, "render">;
 
-export const EditorField = React.forwardRef(
+const EditorFieldBase = React.forwardRef(
   <T extends FieldValues>(
     {
       control,
@@ -49,7 +49,11 @@ export const EditorField = React.forwardRef(
       />
     );
   },
-) as <T extends FieldValues>(
+);
+
+EditorFieldBase.displayName = "EditorField";
+
+export const EditorField = EditorFieldBase as <T extends FieldValues>(
   props: EditorFieldProps<T> & {
     ref?: React.Ref<{ editor: Editor }>;
   },

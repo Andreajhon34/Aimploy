@@ -35,6 +35,11 @@ import { renameResume } from "../_actions/renameResume";
 import { cn } from "@/lib/utils";
 import { TEMPLATES, TEMPLATES_NAME } from "./_lib/templates";
 import { TemplateDialog } from "./_components/TemplatesDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type ResumeBuilderFormProps = {
   id: string;
@@ -139,7 +144,7 @@ export function ResumeBuilderPageClient({
       onSubmit={form.handleSubmit(onSubmit)}
     >
       <motion.div
-        className="flex-1 relative no-scrollbar h-full overflow-y-auto scroll"
+        className="flex-1 min-w-0 relative no-scrollbar h-full overflow-y-auto scroll"
         variants={{
           hidden: { opacity: 0, y: 24 },
           visible: {
@@ -177,17 +182,25 @@ export function ResumeBuilderPageClient({
             )}
           </div>
           <TemplateDialog setTemplate={setTemplate} />
-          <Button
-            size="icon-lg"
-            type="submit"
-            disabled={isSaving}
-            variant="ghost"
-          >
-            <Save />
-            <span className="sr-only">save resume</span>
-          </Button>
+
+          <Tooltip delayDuration={1000}>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon-lg"
+                type="submit"
+                disabled={isSaving}
+                variant="ghost"
+              >
+                <Save />
+                <span className="sr-only">save resume</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>save</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
-        <div className="flex flex-col gap-4 p-4 relative max-w-3xl left-1/2 -translate-x-1/2">
+        <div className="flex flex-col gap-4 p-4 relative left-1/2 -translate-x-1/2">
           <FormProvider {...form}>
             <PersonalInformationCard />
             <ExperienceCard />
@@ -201,7 +214,7 @@ export function ResumeBuilderPageClient({
                       <ChevronDownIcon className="ml-auto group-data-[state=open]:rotate-180" />
                     </Button>
                   </CollapsibleTrigger>
-                  <CollapsibleContent>
+                  <CollapsibleContent className="px-2.5 mt-3">
                     <SkillCard />
                   </CollapsibleContent>
                 </Collapsible>
@@ -219,7 +232,7 @@ export function ResumeBuilderPageClient({
         <Printer className="size-6 mr-2" />
         Export to PDF
       </Button>
-      <div className="flex-1 h-full no-scrollbar overflow-y-auto">
+      <div className="h-full shrink-0 no-scrollbar overflow-y-auto">
         <div
           ref={contentRef}
           className="
